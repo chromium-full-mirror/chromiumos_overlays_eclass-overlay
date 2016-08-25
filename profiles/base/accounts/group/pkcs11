@@ -1,4 +1,4 @@
 group:pkcs11
 gid:208
 # These users all need access to PKCS #11 crypto services.
-users:root,ipsec,chronos,chaps,wpa
+users:root,ipsec,chronos,chaps,wpa,attestation
