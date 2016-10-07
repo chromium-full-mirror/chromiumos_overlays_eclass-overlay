@@ -156,9 +156,47 @@ def CheckConsistency(groups, users):
   return ret
 
 
+def _FindFreeIds(accts, key, low_id, high_id):
+  """Find all free ids in |accts| between |low_id| and |high_id| (inclusive).
+
+  Args:
+    accts: An iterable of account objects.
+    key: The member of the account object holding the id.
+    low_id: The first id to look for.
+    high_id: The last id to look for.
+
+  Returns:
+    A sorted list of free ids.
+  """
+  free_accts = set(range(low_id, high_id + 1))
+  used_accts = set(int(getattr(x, key)) for x in accts)
+  return sorted(free_accts - used_accts)
+
+
+def ShowNextFree(groups, users):
+  """Display next set of free groups/users."""
+  RANGES = (
+      ('CrOS daemons', 200, 299),
+      ('FUSE daemons', 300, 399),
+      ('Standalone', 400, 499),
+      ('Namespaces', 600, 699),
+  )
+  for name, low_id, high_id in RANGES:
+    print('%s:' % name)
+    for accts, key in ((groups, 'gid'), (users, 'uid')):
+      if accts:
+        free_accts = _FindFreeIds(accts, key, low_id, high_id)
+        if len(free_accts) > 10:
+          free_accts = free_accts[0:10] + ['...']
+        print('  %s: %s' % (key, free_accts))
+    print()
+
+
 def GetParser():
   """Creates the argparse parser."""
   parser = argparse.ArgumentParser(description=__doc__)
+  parser.add_argument('--show-free', default=False, action='store_true',
+                      help='Find next available UID/GID')
   parser.add_argument('account', nargs='*',
                       help='Display these account files only')
   return parser
@@ -189,6 +227,10 @@ def main(argv):
     except ValueError as e:
       print('error: %s: %s' % (f, e), file=sys.stderr)
       return os.EX_DATAERR
+
+  if opts.show_free:
+    ShowNextFree(groups, users)
+    return
 
   if groups:
     order = (
