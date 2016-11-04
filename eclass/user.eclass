@@ -24,6 +24,15 @@ if [ "${PN}" != "baselayout" ]; then
 	RDEPEND="sys-apps/baselayout"
 fi
 
+# @FUNCTION: _is_cros_device
+# @INTERNAL
+# @USAGE:
+# @DESCRIPTION:
+# Used to figure out if we're running on a Chromium OS device.
+_is_cros_device() {
+	grep -qs ^CHROMEOS_RELEASE_ /etc/lsb-release
+}
+
 # @FUNCTION: _assert_pkg_ebuild_phase
 # @INTERNAL
 # @USAGE: <calling func name>
@@ -257,6 +266,13 @@ enewuser() {
 		return 0
 	fi
 
+	# We can't support creating accounts on the system yet.
+	# https://crbug.com/402673
+	if _is_cros_device; then
+		ewarn "Skipping user '${euser}' creation due to https://crbug.com/402673"
+		return 0
+	fi
+
 	# Locate all applicable accounts profiles.
 	local ACCOUNTS_DIRS
 	_find_accounts_dirs
@@ -397,6 +413,13 @@ enewgroup() {
 
 	# See if group already exists.
 	if [[ -n $(egetent group "${egroup}") ]] ; then
+		return 0
+	fi
+
+	# We can't support creating accounts on the system yet.
+	# https://crbug.com/402673
+	if _is_cros_device; then
+		ewarn "Skipping group '${egroup}' creation due to https://crbug.com/402673"
 		return 0
 	fi
 
