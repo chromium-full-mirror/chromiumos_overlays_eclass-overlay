@@ -1,0 +1,6 @@
+user:arc-networkd
+uid:284
+gid:284
+gecos:CrOS ARC network service daemon
+home:/dev/null
+shell:/bin/false
