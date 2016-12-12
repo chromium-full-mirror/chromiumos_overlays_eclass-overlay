@@ -1,0 +1,6 @@
+user:authpolicyd-exec
+uid:607
+gid:607
+gecos:authpolicy process executor
+home:/dev/null
+shell:/bin/false
