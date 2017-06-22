@@ -1,0 +1,6 @@
+user:u2f
+uid:290
+gid:290
+gecos:second-factor authentication daemon
+home:/dev/null
+shell:/bin/false
