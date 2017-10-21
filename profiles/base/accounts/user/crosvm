@@ -1,0 +1,6 @@
+user:crosvm
+uid:611
+gid:611
+gecos:CrOS virtual machine monitor
+home:/dev/null
+shell:/bin/false
