@@ -219,6 +219,11 @@ def main(argv):
   for f in accounts:
     try:
       content = open(f).read()
+      if not content:
+        raise ValueError('empty file')
+      if content[-1] != '\n':
+        raise ValueError('missing trailing newline')
+
       name = os.path.basename(f)
       if 'group:' in content:
         groups.append(ParseGroup(name, content))
