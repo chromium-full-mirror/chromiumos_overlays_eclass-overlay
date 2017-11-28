@@ -47,9 +47,10 @@ The password field can be set to one of the following:
 Every UID on CrOS has an associated GID with the same value. The
 opposite does not hold true, however.
 
-CrOS system daemon UIDs (and associated GIDs) range from 200-299. If
-you're creating a new user, pick the first UID in this range that is
-not currently used, and create both a user and a group with this ID.
+CrOS system daemon UIDs (and associated GIDs) range from 200-299 and
+from 20100-29999. If you're creating a new user, pick the first UID in
+the range 20100-29999 that is not currently used, and create both a user
+and a group with this ID.
 
 FUSE-based filesystem daemons have UID/GIDs that range from 300-399.
 If you're adding a daemon that will be talking to `cros-disks` and
