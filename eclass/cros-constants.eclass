@@ -50,3 +50,14 @@ CHROMITE_DIR="${CHROOT_SOURCE_ROOT}/chromite"
 # @DESCRIPTION:
 # Path to location of chromite executable directory in the chroot.
 CHROMITE_BIN_DIR="${CHROMITE_DIR}/bin"
+
+# @ECLASS-VARIABLE: ARC_PREFIX
+# @DESCRIPTION:
+# Path to root directory of ARC++ install (relative to sysroot).
+ARC_PREFIX="/opt/google/containers/android"
+
+# @ECLASS-VARIABLE: ARC_VENDOR_DIR
+# @DESCRIPTION:
+# Path to install directory for temporary /vendor build files (relative to
+# sysroot).
+ARC_VENDOR_DIR="/build/rootfs${ARC_PREFIX}/vendor"
