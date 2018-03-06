@@ -1,4 +1,4 @@
 # Members have read access to the device policy in /var/lib/whitelist.
 group:policy-readers
 gid:303
-users:authpolicyd,chronos,u2f
+users:authpolicyd,chronos,u2f,shill
