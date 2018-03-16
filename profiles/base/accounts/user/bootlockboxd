@@ -1,6 +1,0 @@
-user:bootlockboxd
-uid:20106
-gid:20106
-gecos:bootlockbox daemon
-home:/dev/null
-shell:/bin/false
