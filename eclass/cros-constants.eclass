@@ -61,3 +61,10 @@ ARC_PREFIX="/opt/google/containers/android"
 # Path to install directory for temporary /vendor build files (relative to
 # sysroot).
 ARC_VENDOR_DIR="/build/rootfs${ARC_PREFIX}/vendor"
+
+# @ECLASS-VARIABLE: ARC_ETC_DIR
+# @DESCRIPTION:
+# Path to install directory for temporary /etc build files (relative to
+# sysroot).
+ARC_ETC_DIR="/build/rootfs${ARC_PREFIX}/etc"
+
