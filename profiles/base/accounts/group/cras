@@ -1,4 +1,7 @@
 group:cras
 gid:600
-# The browser runs as chronos, and the power manager needs to check if audio is playing.
-users:chronos,power
+# The browser runs as chronos.
+# The power manager needs to check if audio is playing.
+# The rtanalytics process (running as the rtanalytics user) needs to talk to
+#   cras for audio capture.
+users:chronos,power,rtanalytics
