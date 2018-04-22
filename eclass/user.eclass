@@ -261,6 +261,11 @@ enewuser() {
 		die "Cannot call enewuser without a username"
 	fi
 
+	# lets see if the username already exists in ${ROOT}
+	if [[ -n $(egetent passwd "${euser}") ]] ; then
+		return 0
+	fi
+
 	# We can't support creating accounts on the system yet.
 	# https://crbug.com/402673
 	if _is_cros_device; then
@@ -404,6 +409,11 @@ enewgroup() {
 	if [[ -z ${egroup} ]] ; then
 		eerror "No group specified !"
 		die "Cannot call enewgroup without a group"
+	fi
+
+	# See if group already exists.
+	if [[ -n $(egetent group "${egroup}") ]] ; then
+		return 0
 	fi
 
 	# We can't support creating accounts on the system yet.
