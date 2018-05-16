@@ -1,0 +1,4 @@
+group:fuse
+gid:399
+# This includes all users we run FUSE-based filesystem daemons as.
+users:cros-disks,fuse-exfat,fuse-sshfs,fuse-drivefs,ntfs-3g,avfs
