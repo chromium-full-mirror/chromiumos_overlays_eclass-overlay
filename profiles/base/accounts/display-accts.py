@@ -26,9 +26,23 @@ def _ParseAccount(name, name_key, content, obj, defaults):
   """Parse the raw data in |content| and return a new |obj|"""
   d = defaults.copy()
 
+  # Make sure files all have a trailing newline.
+  if not content.endswith('\n'):
+    raise ValueError('File needs a trailing newline')
+
+  # Disallow leading & trailing blank lines.
+  if content.startswith('\n'):
+    raise ValueError('Delete leading blank lines')
+  if content.endswith('\n\n'):
+    raise ValueError('Delete trailing blank lines')
+
   for line in content.splitlines():
     if not line or line.startswith('#'):
       continue
+
+    # Disallow leading & trailing whitespace.
+    if line != line.strip():
+      raise ValueError('Trim leading/trailing whitespace: "%s"' % line)
 
     key, val = line.split(':')
     if key not in obj._fields:
@@ -197,6 +211,8 @@ def GetParser():
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument('--show-free', default=False, action='store_true',
                       help='Find next available UID/GID')
+  parser.add_argument('--lint', default=False, action='store_true',
+                      help='Validate all the user accounts')
   parser.add_argument('account', nargs='*',
                       help='Display these account files only')
   return parser
@@ -237,30 +253,31 @@ def main(argv):
     ShowNextFree(groups, users)
     return
 
-  if groups:
-    order = (
-        ('gid', ''),
-        ('group', ''),
-        ('password', 'pass'),
-        ('users', ''),
-        ('defunct', ''),
-    )
-    DisplayAccounts(groups, order)
-
-  if users:
+  if not opts.lint:
     if groups:
-      print()
-    order = (
-        ('uid', ''),
-        ('gid', ''),
-        ('user', ''),
-        ('shell', ''),
-        ('home', ''),
-        ('password', 'pass'),
-        ('gecos', ''),
-        ('defunct', ''),
-    )
-    DisplayAccounts(users, order)
+      order = (
+          ('gid', ''),
+          ('group', ''),
+          ('password', 'pass'),
+          ('users', ''),
+          ('defunct', ''),
+      )
+      DisplayAccounts(groups, order)
+
+    if users:
+      if groups:
+        print()
+      order = (
+          ('uid', ''),
+          ('gid', ''),
+          ('user', ''),
+          ('shell', ''),
+          ('home', ''),
+          ('password', 'pass'),
+          ('gecos', ''),
+          ('defunct', ''),
+      )
+      DisplayAccounts(users, order)
 
   if consistency_check and not CheckConsistency(groups, users):
     return os.EX_DATAERR
