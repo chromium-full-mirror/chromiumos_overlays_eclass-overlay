@@ -70,6 +70,15 @@ UID/GID 1000.  There is also a special user/group that has access to
 many resources owned by `chronos`, called `chronos-access`, which has
 the UID/GID 1001.
 
+## Board/project-specific accounts
+
+For boards creating their own users, the 2000-2999 range is reserved for that.
+Boards must take care that they don't create conflicts amongst themselves or
+any project overlays they inherit.
+
+This space is not intended for mainline CrOS use.  Such projects should be
+integrated directly into this overlay instead.  This is only for boards/projects
+that are maintained by partners.
 
 # Creating users and groups in ebuilds
 
