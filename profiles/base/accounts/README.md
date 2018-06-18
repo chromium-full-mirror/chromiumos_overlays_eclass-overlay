@@ -32,14 +32,16 @@ definition, even though traditionally this is done at user-creation
 time.
 
 The password field can be set to one of the following:
-* `!` - The account is locked and may not be logged into (This is the default).
-* `*` - No password yet, but the account has the ability to have one added,
-        so this should be used for accounts that people expect to have a
-        password set for, or want to otherwise login as remotely.
-* `x` - The password is shadowed but the account is for an internal feature;
-        people should not set a password themselves.
-* An encrypted password as per
-  [crypt(3)](http://man7.org/linux/man-pages/man3/crypt.3.html#NOTES).
+
+*   `!` - The account is locked and may not be logged into (this is the
+    default).
+*   `*` - No password yet, but the account has the ability to have one added,
+    so this should be used for accounts that people expect to have a password
+    set for, or want to otherwise login as remotely.
+*   `x` - The password is shadowed but the account is for an internal feature;
+    people should not set a password themselves.
+*   An encrypted password as per
+    [crypt(3)](http://man7.org/linux/man-pages/man3/crypt.3.html#NOTES).
 
 
 # Choosing UIDs and GIDs
@@ -86,10 +88,21 @@ with those in the DB.
 
 Calls to `enewuser` and `enewgroup` are allowed ONLY in three ebuild stanzas:
 
-* `pkg_setup()`: Make the calls here if you need to chown/chgrp files using the
-                 accounts you're creating.
-* `pkg_preinst()`: Make the calls here if you just need the accounts to exist
-                   at runtime.
-* `pkg_postinst()`: Try to avoid making the calls here. If you need a failed
-                    account creation to be non-fatal, then you can add them
-                    here.
+*   `pkg_setup()`: Make the calls here if you need to chown/chgrp files using
+    the accounts you're creating.
+*   `pkg_preinst()`: Make the calls here if you just need the accounts to exist
+    at runtime.
+*   `pkg_postinst()`: Try to avoid making the calls here. If you need a failed
+    account creation to be non-fatal, then you can add them here.
+
+Bear in mind that when creating a new user, simply using `cros deploy` to
+install the new pacakge on the test system will **not** install the new user.
+This is currently being tracked in [crbug.com/402673]. You can build a new
+image (by using `emerge-$BOARD <package>` and `build_image`) to get the new
+user/group to show up in `/etc/passwd` and `/etc/group`.
+
+Alternatively you can `emerge-$BOARD` the package with the new user/group and
+then copy `/build/$BOARD/etc/{passwd,group}` over the device's
+`/etc/{passwd,group}`, via `scp` or some other mechanism.
+
+[crbug.com/402673]: https://bugs.chromium.org/p/chromium/issues/detail?id=402673
