@@ -1,4 +1,0 @@
-group:devbroker-access
-gid:403
-# So the browser can get brokered access to devices.
-users:chronos
