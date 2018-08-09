@@ -1,3 +1,3 @@
 group:debugfs-access
 gid:605
-users:shill
+users:arc-camera,shill
