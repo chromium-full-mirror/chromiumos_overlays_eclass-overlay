@@ -261,8 +261,15 @@ enewuser() {
 		die "Cannot call enewuser without a username"
 	fi
 
-	# lets see if the username already exists in ${ROOT}
-	if [[ -n $(egetent passwd "${euser}") ]] ; then
+	# Lets see if the username already exists in ${ROOT} or in the system.
+	local is_in_root=false
+	[[ -n "$(egetent passwd ${euser})" ]] && is_in_root=true
+	local is_in_system=false
+	[[ -n "$(egetent passwd ${euser} /)" ]] && is_in_system=true
+	local should_be_in_system=false
+	[[ "${EBUILD_PHASE}" == "setup" ]] && should_be_in_system=true
+
+	if "${is_in_root}" && (! "${should_be_in_system}" || "${is_in_system}") ; then
 		return 0
 	fi
 
@@ -381,15 +388,17 @@ enewuser() {
 	local epassword=$(_get_value_for_user "${euser}" password)
 	: ${epassword:="!"}
 	local entry="${euser}:${epassword}:${euid}:${egid}:${comment}:${ehome}:${eshell}"
-	if [[ ${EBUILD_PHASE} == "setup" ]] ; then
+	if ! "${is_in_system}" && "${should_be_in_system}" ; then
 		_write_entry_to_db "${entry}" passwd / || die "Must be able to add users during setup."
 	fi
-	if _write_entry_to_db "${entry}" passwd "${ROOT}" ; then
-		if [[ ! -e ${ROOT}/${ehome} ]] ; then
-			einfo " - Creating ${ehome} in ${ROOT}"
-			mkdir -p "${ROOT}/${ehome}"
-			chown "${euser}" "${ROOT}/${ehome}"
-			chmod 755 "${ROOT}/${ehome}"
+	if ! "${is_in_root}" ; then
+		if _write_entry_to_db "${entry}" passwd "${ROOT}" ; then
+			if [[ ! -e ${ROOT}/${ehome} ]] ; then
+				einfo " - Creating ${ehome} in ${ROOT}"
+				mkdir -p "${ROOT}/${ehome}"
+				chown "${euser}" "${ROOT}/${ehome}"
+				chmod 755 "${ROOT}/${ehome}"
+			fi
 		fi
 	fi
 }
@@ -411,8 +420,15 @@ enewgroup() {
 		die "Cannot call enewgroup without a group"
 	fi
 
-	# See if group already exists.
-	if [[ -n $(egetent group "${egroup}") ]] ; then
+	# Lets see if the group already exists in ${ROOT} or in the system.
+	local is_in_root=false
+	[[ -n "$(egetent group ${egroup})" ]] && is_in_root=true
+	local is_in_system=false
+	[[ -n "$(egetent group ${egroup} /)" ]] && is_in_system=true
+	local should_be_in_system=false
+	[[ "${EBUILD_PHASE}" == "setup" ]] && should_be_in_system=true
+
+	if "${is_in_root}" && (! "${should_be_in_system}" || "${is_in_system}") ; then
 		return 0
 	fi
 
@@ -492,12 +508,13 @@ enewgroup() {
 
 	# Add the group.
 	local entry="${egroup}:${epassword}:${egid}:${eusers}"
-	if [[ ${EBUILD_PHASE} == "setup" ]] ; then
+	if ! "${is_in_system}" && "${should_be_in_system}" ; then
 		_write_entry_to_db "${entry}" group / || die "Must be able to add groups during setup."
 	fi
-	_write_entry_to_db "${entry}" group "${ROOT}"
+	if ! "${is_in_root}" ; then
+		_write_entry_to_db "${entry}" group "${ROOT}"
+	fi
 	einfo "Done with group: '${egroup}'."
-
 }
 
 # @FUNCTION: egethome
