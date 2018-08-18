@@ -109,6 +109,16 @@ _find_acct_template() {
 	done
 }
 
+# @FUNCTION: _read_db_entry
+# @INTERNAL
+# @USAGE: <template> <key>
+# @DESCRIPTION:
+# Read the value from the template database.
+_read_db_entry() {
+	local template=$1 key=$2
+	awk -F':' -v key="${key}" '$1 == key { print $2 }' "${template}"
+}
+
 # @FUNCTION: _get_value_for_user
 # @INTERNAL
 # @USAGE: <user> <key>
@@ -126,7 +136,7 @@ _get_value_for_user() {
 
 	local template=$(_find_acct_template user "${user}")
 	[[ -z "${template}" ]] && die "No entry for ${user} in any overlay."
-	awk -F':' -v key="${key}" '$1 == key { print $2 }' "${template}"
+	_read_db_entry "${template}" "${key}"
 }
 
 # @FUNCTION: _get_value_for_group
@@ -146,7 +156,35 @@ _get_value_for_group() {
 
 	local template=$(_find_acct_template group "${group}")
 	[[ -z "${template}" ]] && die "No entry for ${group} in any overlay."
-	awk -F':' -v key="${key}" '$1 == key { print $2 }' "${template}"
+	_read_db_entry "${template}" "${key}"
+}
+
+# @FUNCTION: _assert_fields_in_sync
+# @INTERNAL
+# @USAGE: <user|group> <account> <keys>
+# @DESCRIPTION:
+# Walks all the overlays and makes sure that the keys have the same values in
+# all of them.  This is useful for making sure uids/gids don't change in case
+# the account name has a collision.
+_assert_fields_in_sync() {
+	local db=$1 acct=$2 keys=( "${@:3}" )
+	local key dir old_dir
+	for key in "${keys[@]}"; do
+		local value old_value=""
+		for dir in "${ACCOUNTS_DIRS[@]}"; do
+			local template="${dir}/${db}/${acct}"
+			if [[ -e "${template}" ]]; then
+				value=$(_read_db_entry "${template}" "${key}")
+				if [[ "${old_value:=${value}}" != "${value}" ]]; then
+					eerror "${db} account '${acct}' has conflicting ${key} values."
+					eerror "${template}: ${key} = ${value}"
+					eerror "${old_dir}/${db}/${acct}: ${key} = ${old_value}"
+					die "${key} must be kept in sync across overlays"
+				fi
+				old_dir="${dir}"
+			fi
+		done
+	done
 }
 
 # @FUNCTION: _portable_grab_lock
@@ -294,6 +332,7 @@ enewuser() {
 	elif [[ -n $(_get_value_for_user "${euser}" defunct) ]] ; then
 		die "'${euser}' was used previously and is now disallowed."
 	fi
+	_assert_fields_in_sync user "${euser}" user uid gid
 	einfo "Adding user '${euser}' to your system ..."
 
 	# Handle uid. Passing no UID is functionally equivalent to passing -1.
@@ -452,6 +491,7 @@ enewgroup() {
 	elif [[ -n $(_get_value_for_group "${egroup}" defunct) ]] ; then
 		die "'${egroup}' was used previously and is now disallowed."
 	fi
+	_assert_fields_in_sync group "${egroup}" group gid
 	einfo "Adding group '${egroup}' to your system ..."
 
 	# handle gid
