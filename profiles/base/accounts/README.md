@@ -72,7 +72,7 @@ the UID/GID 1001.
 
 ## Board/project-specific accounts
 
-For boards creating their own users, the 2000-2999 range is reserved for that.
+For boards creating their own users, the 2000-4999 range is reserved for that.
 Boards must take care that they don't create conflicts amongst themselves or
 any project overlays they inherit.
 
