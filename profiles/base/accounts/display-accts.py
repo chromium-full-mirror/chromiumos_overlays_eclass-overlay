@@ -190,7 +190,7 @@ def _FindFreeIds(accts, key, low_id, high_id):
 def ShowNextFree(groups, users):
   """Display next set of free groups/users."""
   RANGES = (
-      ('CrOS daemons', 200, 299),
+      ('CrOS daemons', 20100, 29999),
       ('FUSE daemons', 300, 399),
       ('Standalone', 400, 499),
       ('Namespaces', 600, 699),
