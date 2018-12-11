@@ -1,0 +1,6 @@
+group:cros_ec-access
+gid:416
+# This group is to grant rw access to /dev/cros_ec
+# runtime_probe because the runtime_probe binary needs
+# access for probing information w/o being root
+users:runtime_probe
