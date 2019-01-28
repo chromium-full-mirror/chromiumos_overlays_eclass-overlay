@@ -918,7 +918,7 @@ python_domodule() {
 		local PYTHON_SITEDIR=${PYTHON_SITEDIR}
 		[[ ${PYTHON_SITEDIR} ]] || python_export PYTHON_SITEDIR
 
-		d=${PYTHON_SITEDIR#${EPREFIX}}/${python_moduleroot//.//}
+		d=${PYTHON_SITEDIR#${SYSROOT}}/${python_moduleroot//.//}
 	fi
 
 	(
@@ -954,7 +954,7 @@ python_doheader() {
 	local d PYTHON_INCLUDEDIR=${PYTHON_INCLUDEDIR}
 	[[ ${PYTHON_INCLUDEDIR} ]] || python_export PYTHON_INCLUDEDIR
 
-	d=${PYTHON_INCLUDEDIR#${EPREFIX}}
+	d=${PYTHON_INCLUDEDIR#${SYSROOT}}
 
 	(
 		insopts -m 0644
