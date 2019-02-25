@@ -381,10 +381,10 @@ enewuser() {
 	# handle shell
 	local eshell=$1; shift
 	if [[ -n ${eshell} && ${eshell} != "-1" ]] ; then
-		if [[ ${eshell} == */false || ${eshell} == */nologin ]] ; then
-			eerror "Do not specify ${eshell} yourself, use -1"
-			die "Pass '-1' as the shell parameter"
-		fi
+		# We might need to relax this for portage-stable if there
+		# are any packages that we want to allow to set a custom shell.
+		eerror "Do not specify ${eshell} yourself, use -1"
+		die "Pass '-1' as the shell parameter"
 	else
 		eshell=$(_get_value_for_user "${euser}" shell)
 		${eshell:=/bin/false}
@@ -399,6 +399,15 @@ enewuser() {
 
 	# handle homedir
 	local ehome=$1; shift
+	if [[ ${ehome:--1} != "-1" ]] ; then
+		if [[ "${PORTAGE_REPO_NAME}" != "portage-stable" ]] ; then
+			die "Pass -1 as the home directory"
+		else
+			# If caller is from portage-stable, ignore specified homedir.
+			einfo "Ignoring requested homedir ${ehome} in portage-stable ebuilds."
+			ehome=''
+		fi
+	fi
 	if [[ -z ${ehome} || ${ehome} == "-1" ]] ; then
 		ehome=$(_get_value_for_user "${euser}" home)
 	fi
