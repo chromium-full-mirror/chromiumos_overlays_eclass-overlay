@@ -2,6 +2,6 @@ user:tor
 uid:214
 gid:214
 gecos:tor, perhaps unused
-home:/dev/null
+home:/var/lib/tor
 shell:/bin/false
 defunct:true
