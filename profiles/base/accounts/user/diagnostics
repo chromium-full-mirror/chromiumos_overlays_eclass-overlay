@@ -1,6 +1,0 @@
-user:diagnostics
-uid:20120
-gid:20120
-gecos:User for telemetry and diagnostics services.
-home:/dev/null
-shell:/bin/false
