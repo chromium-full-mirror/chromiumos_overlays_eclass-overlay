@@ -1,6 +1,0 @@
-# Group for ownership of /run/vm_cicerone/client which will
-# hold UNIX sockets for VM plugin communication with
-# the cicerone daemon.
-group:cicerone-client
-gid:407
-users:vm_cicerone,crosvm

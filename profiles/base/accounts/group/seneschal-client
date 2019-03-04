@@ -1,6 +1,0 @@
-# Group for ownership of /run/seneschal/9p-client which will
-# hold UNIX sockets for VM plugin communication with the 9P
-# server (9s) started by seneschal.
-group:seneschal-client
-gid:417
-users:seneschal,crosvm
