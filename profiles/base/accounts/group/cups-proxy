@@ -1,3 +1,4 @@
 group:cups-proxy
 gid:20136
-users:cups-proxy
+# VMs run as crosvm user
+users:crosvm,cups-proxy
