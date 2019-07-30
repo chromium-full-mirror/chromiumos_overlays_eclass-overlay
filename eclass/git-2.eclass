@@ -384,7 +384,29 @@ git-2_fetch() {
 
 	[[ ${EGIT_LOCAL_NONBARE} ]] && repo_type="non-bare repository" || repo_type="bare repository"
 
-	if [[ ! -d ${EGIT_DIR} ]]; then
+	# Acquire a file lock on EGIT_DIR so that concurrent emerge jobs don't hit
+	# errors due to git contention.
+	[[ -z "${EGIT_DIR}" ]] && die "EGIT_DIR is unset!"
+	mkdir -p "$(dirname "${EGIT_DIR}")"
+	# Strip all trailing slashes from EGIT_DIR and add suffix to generate a
+	# canonical lockfile location for a given git repository.
+	# This lockfile can't be in EGIT_DIR itself because that directory must be
+	# empty for an initial clone to succeed.
+	local lockfile="$(realpath -m "${EGIT_DIR}")-EMERGE_LOCKFILE"
+	exec 200>"${lockfile}" || \
+		die "Unable to access file lock in EGIT_DIR: ${EGIT_DIR}"
+	flock -x 200
+
+	# If the repo directory is corrupt, delete EGIT_DIR to force a fresh clone.
+	if [[ -d "${EGIT_DIR}" ]]; then
+		git -C "${EGIT_DIR}" rev-parse HEAD &>/dev/null
+		if [[ $? -ne 0 ]]; then
+			ewarn "Existing git repo corrupt, removing and initialing clean checkout in ${EGIT_DIR}"
+			rm -rf "${EGIT_DIR}"
+		fi
+	fi
+
+	if [[ ! -d "${EGIT_DIR}" ]]; then
 		git-2_initial_clone
 		pushd "${EGIT_DIR}" > /dev/null || die
 		cursha=$(git rev-parse ${UPSTREAM_BRANCH})
@@ -421,6 +443,11 @@ git-2_fetch() {
 		git --no-pager diff --stat ${oldsha}..${UPSTREAM_BRANCH}
 		popd > /dev/null || die
 	fi
+
+	# Be sure to drop our file lock and close the file descriptor.
+	flock -u 200
+	exec 200>&-
+
 	# export the version the repository is at
 	export EGIT_VERSION="${cursha}"
 	# log the repo state
