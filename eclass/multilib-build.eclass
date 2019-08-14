@@ -49,6 +49,8 @@ _MULTILIB_FLAGS=(
 	abi_ppc_64:ppc64
 	abi_s390_32:s390
 	abi_s390_64:s390x
+	abi_arm_32:arm
+	abi_arm_64:arm64
 )
 readonly _MULTILIB_FLAGS
 
