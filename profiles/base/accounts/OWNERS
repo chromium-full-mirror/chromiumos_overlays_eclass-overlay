@@ -3,7 +3,4 @@ set noparent
 per-file *.py = file: /OWNERS
 
 # The security team are domain experts in account isolation.
-allenwebb@chromium.org
-jorgelo@chromium.org
-mnissler@chromium.org
-vapier@chromium.org
+include OWNERS.security
