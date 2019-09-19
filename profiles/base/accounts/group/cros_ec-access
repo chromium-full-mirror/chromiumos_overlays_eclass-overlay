@@ -1,6 +1,8 @@
 group:cros_ec-access
 gid:416
-# This group is to grant rw access to /dev/cros_ec
-# runtime_probe because the runtime_probe binary needs
-# access for probing information w/o being root
-users:runtime_probe
+# This group is to grant rw access of /dev/cros_ec to
+# runtime_probe and healthd_ec because the runtime_probe
+# and cros_healthd_helper (which is invoked by debugd and
+# runs as healthd_ec) binaries need access for probing
+# information w/o being root.
+users:runtime_probe,healthd_ec
