@@ -213,13 +213,13 @@ _portable_grab_lock() {
 # @USAGE: <entry> <database> <root>
 # @DESCRIPTION:
 # Writes an entry to the specified database under the specified root.
+# Supported databases: passwd group shadow
 _write_entry_to_db() {
 	local entry=$1 db=$2 root=$3
-
 	[[ $# -ne 3 ]] && die "usage: _write_entry_to_db <entry> <database> <root>"
 
 	case ${db} in
-	passwd|group) ;;
+	passwd|group|shadow) ;;
 	*) die "sorry, database '${db}' not supported." ;;
 	esac
 
@@ -253,16 +253,22 @@ _write_entry_to_db() {
 # @DESCRIPTION:
 # Provides getent-like functionality for databases under [root]. Defaults to ${ROOT}.
 #
-# Supported databases: group passwd
+# Supported databases: group passwd shadow
 egetent() {
 	local use_lock=true
-	[[ $1 == "--nolock" ]] && use_lock=false && shift
-	[[ $# -ne 2 && $# -ne 3 ]] && die "usage: egetent <database> <key> [root]"
+	if [[ $1 == "--nolock" ]]; then
+		use_lock=false
+		shift
+	fi
+
+	if [[ $# -ne 2 && $# -ne 3 ]]; then
+		die "usage: egetent <database> <key> [root]"
+	fi
 
 	local db=$1 key=$2 root=${3:-"${ROOT}"}
 
 	case ${db} in
-	passwd|group) ;;
+	passwd|group|shadow) ;;
 	*) die "sorry, database '${db}' not yet supported; file a bug" ;;
 	esac
 
@@ -301,14 +307,18 @@ enewuser() {
 
 	# Lets see if the username already exists in ${ROOT} or in the system.
 	local is_in_root=false
-	[[ -n "$(egetent passwd ${euser})" ]] && is_in_root=true
-	local is_in_system=false
-	[[ -n "$(egetent passwd ${euser} /)" ]] && is_in_system=true
-	local should_be_in_system=false
-	[[ "${EBUILD_PHASE}" == "setup" ]] && should_be_in_system=true
+	if [[ -n "$(egetent passwd "${euser}")" ]]; then
+		is_in_root=true
+	fi
 
-	if "${is_in_root}" && (! "${should_be_in_system}" || "${is_in_system}") ; then
-		return 0
+	local is_in_system=false
+	if [[ -n "$(egetent passwd "${euser}" /)" ]]; then
+		is_in_system=true
+	fi
+
+	local should_be_in_system=false
+	if [[ "${EBUILD_PHASE}" == "setup" ]]; then
+		should_be_in_system=true
 	fi
 
 	# We can't support creating accounts on the system yet.
@@ -323,6 +333,26 @@ enewuser() {
 	_find_accounts_dirs
 	if [[ ${#ACCOUNTS_DIRS[@]} -eq 0 ]] ; then
 		ewarn "No user/group data files present. Skipping."
+		return 0
+	fi
+
+	# Check if user entry requires password (has a password of "x").
+	# If so, check if shadow file already contains an entry for the user.
+	# About passwords in shadow files: src/third_party/eclass-overlay/profiles/base/accounts/README.md
+	local epassword=$(_get_value_for_user "${euser}" password)
+	: "${epassword:="!"}"
+	local should_have_shadow_entry=false
+	local is_in_shadow=false
+	if [[ ${epassword} == "x" ]]; then
+		should_have_shadow_entry=true
+		if [[ -n "$(egetent shadow "${euser}")" ]]; then
+			is_in_shadow=true
+		fi
+	fi
+
+	if "${is_in_root}" &&
+			(! "${should_have_shadow_entry}" || "${is_in_shadow}") &&
+			(! "${should_be_in_system}" || "${is_in_system}") ; then
 		return 0
 	fi
 
@@ -358,7 +388,7 @@ enewuser() {
 		# If profile has UID and caller specified same, OK.
 		if [[ ${euid} == -1 ]] ; then
 			euid=${provided_uid}
-		elif [[ ${euid} != ${provided_uid} ]] ; then
+		elif [[ ${euid} != "${provided_uid}" ]] ; then
 			eerror "Userid differs from the profile!"
 			die "${euid} != ${provided_uid} from profile."
 			# else...they're already equal, so do nothing.
@@ -433,12 +463,22 @@ enewuser() {
 		einfo " - GECOS: ${comment}"
 	fi
 
-	local epassword=$(_get_value_for_user "${euser}" password)
-	: ${epassword:="!"}
 	local entry="${euser}:${epassword}:${euid}:${egid}:${comment}:${ehome}:${eshell}"
+	local sentry="${euser}:x:::::::"
+
 	if ! "${is_in_system}" && "${should_be_in_system}" ; then
 		_write_entry_to_db "${entry}" passwd / || die "Must be able to add users during setup."
 	fi
+
+	local is_in_system_shadow=false
+	if [[ -n "$(egetent shadow "${euser}" /)" ]]; then
+		is_in_system_shadow=true
+	fi
+
+	if ! "${is_in_system_shadow}" && "${should_be_in_system}" && "${should_have_shadow_entry}" ; then
+		_write_entry_to_db "${sentry}" shadow / || die "Must be able to add users during setup."
+	fi
+
 	if ! "${is_in_root}" ; then
 		if _write_entry_to_db "${entry}" passwd "${ROOT}" ; then
 			if [[ ! -e ${ROOT}/${ehome} ]] ; then
@@ -447,6 +487,9 @@ enewuser() {
 				chown "${euser}" "${ROOT}/${ehome}"
 				chmod 755 "${ROOT}/${ehome}"
 			fi
+		fi
+		if "${should_have_shadow_entry}" ; then
+			_write_entry_to_db "${sentry}" shadow "${ROOT}"
 		fi
 	fi
 }
@@ -470,9 +513,9 @@ enewgroup() {
 
 	# Lets see if the group already exists in ${ROOT} or in the system.
 	local is_in_root=false
-	[[ -n "$(egetent group ${egroup})" ]] && is_in_root=true
+	[[ -n "$(egetent group "${egroup}")" ]] && is_in_root=true
 	local is_in_system=false
-	[[ -n "$(egetent group ${egroup} /)" ]] && is_in_system=true
+	[[ -n "$(egetent group "${egroup}" /)" ]] && is_in_system=true
 	local should_be_in_system=false
 	[[ "${EBUILD_PHASE}" == "setup" ]] && should_be_in_system=true
 
@@ -516,7 +559,7 @@ enewgroup() {
 	if [[ -z ${egid} ]] ; then
 		# If caller specified nothing and profile has GID, use profile.
 		# If caller specified nothing and profile has no GID, barf.
-		if [[ ! -z ${provided_gid} ]] ; then
+		if [[ -n  ${provided_gid} ]] ; then
 			egid=${provided_gid}
 		else
 			die "No gid provided in PROFILE or in args!"
@@ -548,7 +591,7 @@ enewgroup() {
 
 	# Allow group passwords, if profile asks for it.
 	local epassword=$(_get_value_for_group "${egroup}" password)
-	: ${epassword:="!"}
+	: "${epassword:="!"}"
 	einfo " - Password entry: ${epassword}"
 
 	# Pre-populate group with users.
