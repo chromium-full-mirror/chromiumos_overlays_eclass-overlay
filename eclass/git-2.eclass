@@ -14,7 +14,11 @@
 # This eclass support all EAPIs.
 EXPORT_FUNCTIONS src_unpack
 
-DEPEND="dev-vcs/git"
+if [[ ${EAPI:-0} != [0123456] ]]; then
+	BDEPEND="dev-vcs/git"
+else
+	DEPEND="dev-vcs/git"
+fi
 
 # @ECLASS-VARIABLE: EGIT_SOURCEDIR
 # @DESCRIPTION:
