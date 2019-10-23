@@ -10,9 +10,9 @@
 # (like being able to build kernel modules), so we can't nerf the whole thing.
 #
 # When updating, make sure to restore the hacks below:
-# - Disable EXPORT_FUNCTIONS.
 # - Disable check_extra_config.
-# - Disable linux-info_pkg_setup.
+# - Disable linux-info_pkg_setup for binpkgs.
+# - Disable linux-info_pkg_setup for non-kernel-modules.
 # Otherwise, everything else can be updated/replaced as-is.
 
 # @ECLASS: linux-info.eclass
@@ -123,8 +123,7 @@
 inherit toolchain-funcs
 [[ ${EAPI:-0} == [0123456] ]] && inherit eapi7-ver
 
-# CrOS: We don't want this.  See block at top of file for details.
-#EXPORT_FUNCTIONS pkg_setup
+EXPORT_FUNCTIONS pkg_setup
 
 IUSE="kernel_linux"
 
@@ -961,8 +960,12 @@ check_zlibinflate() {
 # Force a get_version() call when inherited from linux-mod.eclass and then check if the kernel is configured
 # to support the options specified in CONFIG_CHECK (if not null)
 linux-info_pkg_setup() {
-	# CrOS: We don't want this.  See block at top of file for details.
-	return
+	# CrOS: The kernel build time details don't matter to binpkgs.
+	[[ "${MERGE_TYPE}" == "binary" ]] && return
+	# CrOS: We only need to load kernel build details when building kernel modules.
+	if [[ $(type -t linux-mod_pkg_setup) != "function" ]]; then
+		return
+	fi
 
 	use kernel_linux || return
 
