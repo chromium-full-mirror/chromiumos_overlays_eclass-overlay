@@ -66,9 +66,11 @@ _find_accounts_dirs() {
 	# will be saved at build time and used when merging binpkgs.  Instead,
 	# we need it to be generated at binpkg time too.
 	local cache="${T}/_accounts_dir_cache.list"
-	if [[ -e ${cache} ]]; then
+	if [[ -s ${cache} ]]; then
+		einfo "Using cached list ${cache}"
 		local dir
 		while read -d $'\0' -r dir; do
+			einfo "Adding ${dir} to user/group search path."
 			ACCOUNTS_DIRS+=("${dir}")
 		done <"${cache}"
 		return
@@ -105,8 +107,14 @@ _find_acct_template() {
 	local accounts_dir
 	for accounts_dir in "${ACCOUNTS_DIRS[@]}" ; do
 		local template="${accounts_dir}/${db}/${key}"
-		[[ -e "${template}" ]] && echo "${template}" && break
+		if  [[ -e "${template}" ]]; then
+			echo "${template}"
+			return
+		fi
 	done
+
+	# If we're still here, something has gone wrong.
+	eerror "ACCOUNTS_DIRS = ${ACCOUNTS_DIRS[*]}"
 }
 
 # @FUNCTION: _read_db_entry
