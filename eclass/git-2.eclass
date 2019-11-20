@@ -14,6 +14,8 @@
 # This eclass support all EAPIs.
 EXPORT_FUNCTIONS src_unpack
 
+PROPERTIES+=" live"
+
 if [[ ${EAPI:-0} != [0123456] ]]; then
 	BDEPEND="dev-vcs/git"
 else

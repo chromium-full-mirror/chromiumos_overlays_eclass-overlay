@@ -21,6 +21,8 @@ inherit eutils
 
 EGIT="git.eclass"
 
+PROPERTIES+=" live"
+
 # We DEPEND on a not too ancient git version
 DEPEND=">=dev-vcs/git-1.6"
 
