@@ -359,6 +359,12 @@ enewuser() {
 	local is_in_shadow=false
 	if [[ ${epassword} == "x" ]]; then
 		should_have_shadow_entry=true
+
+		# Make sure shadow file exists.
+		if [[ ! -f "${ROOT}/etc/shadow" ]]; then
+			touch "${ROOT}/etc/shadow" || die
+		fi
+
 		if [[ -n "$(egetent shadow "${euser}")" ]]; then
 			is_in_shadow=true
 		fi
@@ -485,6 +491,12 @@ enewuser() {
 	fi
 
 	local is_in_system_shadow=false
+
+	# Make sure shadow file exists.
+	if [[ ! -f "/etc/shadow" ]]; then
+		touch "/etc/shadow" || die
+	fi
+
 	if [[ -n "$(egetent shadow "${euser}" /)" ]]; then
 		is_in_system_shadow=true
 	fi
