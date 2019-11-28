@@ -94,7 +94,12 @@ _find_accounts_dirs() {
 # @INTERNAL
 # @USAGE: <portageq command> [<arg> ...]
 _call_portageq() {
-	echo $(env -i PATH="${PATH}" PORTAGE_USERNAME="${PORTAGE_USERNAME}" PORTAGE_CONFIGROOT="${PORTAGE_CONFIGROOT}" portageq "$@")
+	echo $(env -i \
+		PATH="${PATH}" \
+		LC_ALL="en_US.UTF-8" \
+		PORTAGE_USERNAME="${PORTAGE_USERNAME}" \
+		PORTAGE_CONFIGROOT="${PORTAGE_CONFIGROOT}" \
+		portageq "$@")
 }
 
 # @FUNCTION: _find_acct_template
