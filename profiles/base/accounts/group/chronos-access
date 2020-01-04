@@ -4,4 +4,4 @@ gid:1001
 # mostly system daemons running as a non-chronos user, group permissions
 # to access files/directories owned by chronos.
 # This includes all users accessing opencryptoki database files.
-users:root,ipsec,chronos,chaps,cros-disks,imageloaderd
+users:root,ipsec,chronos,chaps,cros-disks,imageloaderd,crash
