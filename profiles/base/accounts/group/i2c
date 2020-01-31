@@ -1,6 +1,6 @@
 group:i2c
 gid:404
-# fwupdate-i2c: For firmware updater utilities that use the i2c-dev interface.
-# power: Give the power manager access to I2C devices so it can adjust external
-#   displays' brightness via DDC.
-users:fwupdate-i2c,power
+# fwupdate-drm_dp_aux-i2c: For firmware updater utilities that use /dev/drm_dp_aux* and /dev/i2c-* devices.
+# fwupdate-i2c: For firmware updater utilities that use /dev/i2c-* devices.
+# power: Give the power manager access to I2C devices so it can adjust external display brightness via DDC.
+users:fwupdate-drm_dp_aux-i2c,fwupdate-i2c,power
