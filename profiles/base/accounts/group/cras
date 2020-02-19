@@ -5,4 +5,4 @@ gid:600
 # The power manager needs to check if audio is playing.
 # The rtanalytics process (running as the rtanalytics user) needs to talk to
 #   cras for audio capture.
-users:chronos,crosvm,power,rtanalytics
+users:chronos,crosvm,power,rtanalytics,sound_card_init
