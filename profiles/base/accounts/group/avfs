@@ -1,3 +1,4 @@
 group:avfs
 gid:301
 users:cros-disks
+defunct:true
