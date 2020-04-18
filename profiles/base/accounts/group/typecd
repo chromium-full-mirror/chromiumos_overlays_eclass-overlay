@@ -1,0 +1,4 @@
+group:typecd
+gid:20146
+# The browser runs as chronos.
+users:chronos
