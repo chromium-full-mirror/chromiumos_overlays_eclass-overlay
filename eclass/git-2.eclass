@@ -16,10 +16,9 @@ EXPORT_FUNCTIONS src_unpack
 
 PROPERTIES+=" live"
 
+# NB: We omit git for older EAPI's to avoid circular deps in board sysroots.
 if [[ ${EAPI:-0} != [0123456] ]]; then
 	BDEPEND="dev-vcs/git"
-else
-	DEPEND="dev-vcs/git"
 fi
 
 # @ECLASS-VARIABLE: EGIT_SOURCEDIR

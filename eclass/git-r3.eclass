@@ -27,10 +27,9 @@ if [[ ! ${_GIT_R3} ]]; then
 PROPERTIES+=" live"
 
 if [[ ! ${_INHERITED_BY_GIT_2} ]]; then
+	# NB: We omit git for older EAPI's to avoid circular deps in board sysroots.
 	if [[ ${EAPI:-0} != [0123456] ]]; then
 		BDEPEND=">=dev-vcs/git-1.8.2.1[curl]"
-	else
-		DEPEND=">=dev-vcs/git-1.8.2.1[curl]"
 	fi
 fi
 
