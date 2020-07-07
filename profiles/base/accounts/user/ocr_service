@@ -1,0 +1,6 @@
+user:ocr_service
+uid:20148
+gid:20148
+gecos:User of Optical Character Recognition service.
+home:/dev/null
+shell:/bin/false
