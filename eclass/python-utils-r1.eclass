@@ -804,7 +804,7 @@ python_domodule() {
 	else
 		# relative to site-packages
 		local sitedir=$(python_get_sitedir)
-		d=${sitedir#${EPREFIX}}/${python_moduleroot//.//}
+		d=${sitedir#${SYSROOT}}/${python_moduleroot//.//}
 	fi
 
 	(
@@ -835,7 +835,7 @@ python_doheader() {
 	[[ ${EPYTHON} ]] || die 'No Python implementation set (EPYTHON is null).'
 
 	local includedir=$(python_get_includedir)
-	local d=${includedir#${EPREFIX}}
+	local d=${includedir#${SYSROOT}}
 
 	(
 		insopts -m 0644
