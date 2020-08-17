@@ -11,5 +11,5 @@ inherit user
 # TODO(crbug/1026816): this is a placeholder (to satisfy Gentoo
 #  openssh dependencies) while acct-{group,user} are implemented.
 pkg_setup() {
-	enewgroup sshd
+	enewuser sshd
 }
