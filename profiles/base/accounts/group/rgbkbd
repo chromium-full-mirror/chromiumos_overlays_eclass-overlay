@@ -1,3 +1,4 @@
 group:rgbkbd
 gid:20186
-users:rgbkbd
+# power: For backlight control of a keyboard connected via USB.
+users:rgbkbd,power
