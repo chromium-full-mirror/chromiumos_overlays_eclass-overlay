@@ -1,6 +1,6 @@
 user:arc-data-snapshotd
-uid:20148
-gid:20148
+uid:20153
+gid:20153
 gecos:User for arc-data-snapshotd service.
 home:/dev/null
 shell:/bin/false
