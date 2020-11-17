@@ -1,0 +1,6 @@
+user:pciguard
+uid:20160
+gid:20160
+gecos:External PCI device authorization daemon
+home:/dev/null
+shell:/bin/false
