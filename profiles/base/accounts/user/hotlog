@@ -1,0 +1,6 @@
+user:hotlog
+uid:20169
+gid:20169
+gecos:CfM cloud logging service
+home:/dev/null
+shell:/bin/false
