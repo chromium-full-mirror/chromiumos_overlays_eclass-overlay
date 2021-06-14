@@ -1,0 +1,6 @@
+user:tpm_tunneld
+uid:20180
+gid:20180
+gecos:CrOS TPM tunnel daemon for pinweaver-CSME
+home:/dev/null
+shell:/bin/false
