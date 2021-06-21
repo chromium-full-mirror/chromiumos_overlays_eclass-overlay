@@ -4,3 +4,4 @@ gid:212
 gecos:strongswan, other ipsec VPNs
 home:/dev/null
 shell:/bin/false
+defunct:true
