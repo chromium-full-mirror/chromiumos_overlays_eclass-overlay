@@ -1,6 +1,8 @@
 # Copyright 2017-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
+# CROS: Modifications from upstream are marked like this
+
 # @ECLASS: meson.eclass
 # @MAINTAINER:
 # William Hubbs <williamh@gentoo.org>
@@ -179,6 +181,9 @@ _meson_create_cross_file() {
 	pkgconfig = '$(tc-getPKG_CONFIG)'
 	strip = $(_meson_env_array "$(tc-getSTRIP)")
 	windres = $(_meson_env_array "$(tc-getRC)")
+
+	# CROS: set a wrapper script for running tests
+	exe_wrapper = ['/mnt/host/source/src/platform2/common-mk/meson_test.py']
 
 	[built-in options]
 	c_args = $(_meson_env_array "${CFLAGS} ${CPPFLAGS}")
