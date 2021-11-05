@@ -4,4 +4,6 @@ gid:1001
 # mostly system daemons running as a non-chronos user, group permissions
 # to access files/directories owned by chronos.
 # This includes all users accessing opencryptoki database files.
-users:root,vpn,chronos,cros-disks,imageloaderd,crash,dlp,image-burner,spaced
+#
+# Processes running with chronos-access need enforcing SELinux domains.
+users:vpn,chronos,cros-disks,imageloaderd,crash,dlp,image-burner,spaced
