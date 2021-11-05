@@ -4,3 +4,4 @@ gid:217
 gecos:openvpn
 home:/dev/null
 shell:/bin/false
+defunct:true
