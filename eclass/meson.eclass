@@ -1,6 +1,8 @@
 # Copyright 2017-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
+# CROS: Modifications from upstream are marked like this
+
 # @ECLASS: meson.eclass
 # @MAINTAINER:
 # William Hubbs <williamh@gentoo.org>
@@ -145,6 +147,18 @@ _meson_get_machine_info() {
 	cpu=${tuple%%-*}
 }
 
+# @FUNCTION: _meson_get_exe_wrapper
+# @RETURN: path to exe_wrapper
+# @INTERNAL
+# @DESCRIPTION:
+# Gets the path to exe_wrapper.
+_meson_get_exe_wrapper() {
+	# TODO: remove once we are completely migrated away from python2
+	if [[ -z ${EPYTHON} ]] || python_is_python3; then
+		echo "/mnt/host/source/src/platform2/common-mk/meson_test.py"
+	fi
+}
+
 # @FUNCTION: _meson_create_cross_file
 # @RETURN: path to cross file
 # @INTERNAL
@@ -171,6 +185,9 @@ _meson_create_cross_file() {
 	pkgconfig = '$(tc-getPKG_CONFIG)'
 	strip = $(_meson_env_array "$(tc-getSTRIP)")
 	windres = $(_meson_env_array "$(tc-getRC)")
+
+	# CROS: set a wrapper script for running tests
+	exe_wrapper = ['$(_meson_get_exe_wrapper)']
 
 	[built-in options]
 	c_args = $(_meson_env_array "${CFLAGS} ${CPPFLAGS}")
