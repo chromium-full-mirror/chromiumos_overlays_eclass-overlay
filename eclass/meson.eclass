@@ -419,6 +419,8 @@ meson_src_test() {
 	debug-print-function ${FUNCNAME} "$@"
 
 	local mesontestargs=(
+		# CROS: https://github.com/gentoo/gentoo/pull/24561
+		--print-errorlogs
 		-C "${BUILD_DIR}"
 		--num-processes "$(makeopts_jobs "${MAKEOPTS}")"
 		"$@"
