@@ -77,10 +77,10 @@ _python_impl_supported() {
 	# keep in sync with _PYTHON_ALL_IMPLS!
 	# (not using that list because inline patterns shall be faster)
 	case "${impl}" in
-		python2_7|python3_[6789]|pypy3)
+		python3_[6-9]|pypy3)
 			return 0
 			;;
-		jython2_7|pypy|pypy1_[89]|pypy2_0|python2_[56]|python3_[12345])
+		python2_7)
 			return 1
 			;;
 		*)
