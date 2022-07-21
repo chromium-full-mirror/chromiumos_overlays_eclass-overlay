@@ -12,7 +12,12 @@ import argparse
 import collections
 import glob
 import os
+import re
 import sys
+
+
+# Regex to match valid account names.
+VALID_ACCT_NAME_RE = re.compile(r'^[a-z][a-z0-9_-]*[a-z0-9]$')
 
 
 # Objects to hold group/user accounts.
@@ -150,6 +155,13 @@ def CheckConsistency(groups, users):
     ret = False
     dupes = ', '.join(x.user for x in users if x.uid == uid)
     print('error: duplicate uid found: %s: %s' % (uid, dupes), file=sys.stderr)
+
+  for group in groups:
+    if not VALID_ACCT_NAME_RE.match(group.group):
+      print(f'error: invalid group account name: {group.group}')
+  for user in users:
+    if not VALID_ACCT_NAME_RE.match(user.user):
+      print(f'error: invalid user account name: {user.user}')
 
   found_users = set(x.user for x in users)
   want_users = set()
