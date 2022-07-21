@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 # Copyright (c) 2014 The Chromium OS Authors. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
 """Pretty print (and check) a set of group/user accounts"""
-
-from __future__ import print_function
 
 import argparse
 import collections
@@ -14,6 +11,10 @@ import glob
 import os
 import re
 import sys
+
+
+assert sys.version_info >= (3, 6), (
+    f'Python 3.6+ required, but found {sys.version_info}')
 
 
 # Regex to match valid account names.
