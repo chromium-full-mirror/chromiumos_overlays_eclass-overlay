@@ -71,6 +71,14 @@ UID/GID 1000.  There is also a special user/group that has access to
 many resources owned by `chronos`, called `chronos-access`, which has
 the UID/GID 1001.
 
+# Testing
+
+If a newly added group has users, it is necessary to also add matching
+information to [`cros/test/usergroup_baseline.py`](https://chromium.googlesource.com/chromiumos/chromite/+/HEAD/cros/test/usergroup_baseline.py):
+```
+GroupEntry(group='cras', gid=220, users={'chronos', 'power'}),
+```
+
 ## Board/project-specific accounts
 
 For boards creating their own users, the 2000-4999 range is reserved for that.
