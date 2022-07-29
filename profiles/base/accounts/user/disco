@@ -1,0 +1,6 @@
+user:disco
+uid:20192
+gid:20192
+gecos:Disk control daemon
+home:/dev/null
+shell:/bin/false
