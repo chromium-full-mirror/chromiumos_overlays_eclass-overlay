@@ -1,4 +1,4 @@
 group:hidraw
 gid:403
-# fwupdate-hidraw: For firmware updater utilities that use the hidraw interface.
-users:fwupdate-hidraw
+# fwupd, fwupdate-hidraw: For fwupd & utilities that use the hidraw interface.
+users:fwupd,fwupdate-hidraw
