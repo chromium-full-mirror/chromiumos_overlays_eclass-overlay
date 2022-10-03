@@ -1,4 +1,4 @@
-group:cros_fp-access
+group:fpdev
 gid:426
 # This group is to grant rw access of /dev/cros_fp to biod, healthd_fp, because
 # the binaries they run need access w/o being root.
