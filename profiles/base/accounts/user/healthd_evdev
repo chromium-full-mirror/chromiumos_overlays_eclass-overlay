@@ -1,0 +1,6 @@
+user:healthd_evdev
+uid:20198
+gid:20198
+gecos:Healthd user for accessing event device (evdev).
+home:/dev/null
+shell:/bin/false
