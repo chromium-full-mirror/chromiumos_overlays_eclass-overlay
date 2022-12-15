@@ -16,6 +16,9 @@ case ${EAPI} in
 *) die "${ECLASS}: EAPI ${EAPI:-0} not supported" ;;
 esac
 
+if [[ -z ${_USER_ECLASS} ]]; then
+_USER_ECLASS=1
+
 # Before we manipulate users at all, we want to make sure that
 # passwd/group/shadow is initialized in the first place. That's
 # what baselayout does.
@@ -659,3 +662,5 @@ egetshell() {
 	[[ $# -eq 1 ]] || die "usage: egetshell <user>"
 	egetent passwd "$1" | cut -d: -f7
 }
+
+fi
