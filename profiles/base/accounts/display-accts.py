@@ -7,8 +7,8 @@
 
 import argparse
 import collections
-import glob
 import os
+from pathlib import Path
 import re
 import sys
 from typing import Dict, List, NamedTuple
@@ -230,7 +230,7 @@ def GetParser():
                       help='Find next available UID/GID')
   parser.add_argument('--lint', default=False, action='store_true',
                       help='Validate all the user accounts')
-  parser.add_argument('account', nargs='*',
+  parser.add_argument('account', nargs='*', type=Path,
                       help='Display these account files only')
   return parser
 
@@ -242,26 +242,25 @@ def main(argv):
   accounts = opts.account
   consistency_check = False
   if not accounts:
-    accounts_dir = os.path.dirname(os.path.realpath(__file__))
-    accounts = (glob.glob(os.path.join(accounts_dir, 'group', '*')) +
-                glob.glob(os.path.join(accounts_dir, 'user', '*')))
+    accounts_dir = Path(__file__).resolve().parent
+    accounts = (list((accounts_dir / 'group').glob('*')) +
+                list((accounts_dir / 'user').glob('*')))
     consistency_check = True
 
   groups = []
   users = []
   for f in accounts:
     try:
-      content = open(f).read()
+      content = f.read_text(encoding='utf-8')
       if not content:
         raise ValueError('empty file')
       if content[-1] != '\n':
         raise ValueError('missing trailing newline')
 
-      name = os.path.basename(f)
       if 'group:' in content:
-        groups.append(ParseGroup(name, content))
+        groups.append(ParseGroup(f.name, content))
       else:
-        users.append(ParseUser(name, content))
+        users.append(ParseUser(f.name, content))
     except ValueError as e:
       print('error: %s: %s' % (f, e), file=sys.stderr)
       return os.EX_DATAERR
