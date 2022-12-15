@@ -1,10 +1,10 @@
-# Copyright (c) 2013 The Chromium OS Authors. All rights reserved.
+# Copyright 2013 The ChromiumOS Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
 # @ECLASS: user.eclass
 # @MAINTAINER:
-# The Chromium OS Authors. <chromium-os-dev@chromium.org>
+# The ChromiumOS Authors <chromium-os-dev@chromium.org>
 # @BLURB: user management in ebuilds
 # @DESCRIPTION:
 # Replaces the upstream mechanism of managing users and groups with one that

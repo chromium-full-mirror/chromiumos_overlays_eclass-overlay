@@ -1,4 +1,4 @@
-# Copyright (c) 2013 The Chromium OS Authors. All rights reserved.
+# Copyright 2013 The ChromiumOS Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: cros-constants.eclass
@@ -67,4 +67,3 @@ ARC_VENDOR_DIR="/build/rootfs${ARC_PREFIX}/vendor"
 # Path to install directory for temporary /etc build files (relative to
 # sysroot).
 ARC_ETC_DIR="/build/rootfs${ARC_PREFIX}/etc"
-
