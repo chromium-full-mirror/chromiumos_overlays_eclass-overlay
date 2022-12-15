@@ -11,6 +11,11 @@
 # manages the database in ${ROOT}, changing the sysroot database
 # only when the caller creates the user/group during setup.
 
+case ${EAPI} in
+5|6|7|8) ;;
+*) die "${ECLASS}: EAPI ${EAPI:-0} not supported" ;;
+esac
+
 # Before we manipulate users at all, we want to make sure that
 # passwd/group/shadow is initialized in the first place. That's
 # what baselayout does.
