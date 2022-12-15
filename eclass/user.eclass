@@ -635,6 +635,7 @@ enewgroup() {
 	einfo "Done with group: '${egroup}'."
 }
 
+# TODO(b/187790077): Delete this once ebuilds move to user-info.eclass.
 # @FUNCTION: egethome
 # @USAGE: <user>
 # @DESCRIPTION:
@@ -644,6 +645,7 @@ egethome() {
 	egetent passwd "$1" | cut -d: -f6
 }
 
+# TODO(b/187790077): Delete this once ebuilds move to user-info.eclass.
 # @FUNCTION: egetshell
 # @USAGE: <user>
 # @DESCRIPTION:
