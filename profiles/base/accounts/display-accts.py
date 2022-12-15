@@ -11,6 +11,7 @@ import glob
 import os
 import re
 import sys
+from typing import Dict, List, NamedTuple
 
 
 assert sys.version_info >= (3, 6), (
@@ -21,17 +22,31 @@ assert sys.version_info >= (3, 6), (
 VALID_ACCT_NAME_RE = re.compile(r'^[a-z][a-z0-9_-]*[a-z0-9]$')
 
 
-# Objects to hold group/user accounts.
-Group = collections.namedtuple('Group', ('group', 'password', 'gid', 'users',
-                                         'defunct'))
-User = collections.namedtuple('User', ('user', 'password', 'uid', 'gid',
-                                       'gecos', 'home', 'shell', 'defunct'))
+class Group(NamedTuple):
+  """A group account."""
+  # NB: Order is not the same as /etc/group.  Don't rely on it.
+  group: str
+  gid: str
+  password: str = '!'
+  users: str = ''
+  defunct: str = ''
 
 
-def _ParseAccount(name, name_key, content, obj, defaults):
+class User(NamedTuple):
+  """A user account."""
+  # NB: Order is not the same as /etc/passwd.  Don't rely on it.
+  user: str
+  uid: str
+  gid: str
+  password: str = '!'
+  gecos: str = ''
+  home: str = '/dev/null'
+  shell: str = '/bin/false'
+  defunct: str = ''
+
+
+def _ParseAccount(name, name_key, content, obj):
   """Parse the raw data in |content| and return a new |obj|"""
-  d = defaults.copy()
-
   # Make sure files all have a trailing newline.
   if not content.endswith('\n'):
     raise ValueError('File needs a trailing newline')
@@ -42,6 +57,7 @@ def _ParseAccount(name, name_key, content, obj, defaults):
   if content.endswith('\n\n'):
     raise ValueError('Delete trailing blank lines')
 
+  d = {}
   for line in content.splitlines():
     if not line or line.startswith('#'):
       continue
@@ -55,9 +71,9 @@ def _ParseAccount(name, name_key, content, obj, defaults):
       raise ValueError('unknown key: %s' % key)
     d[key] = val
 
-  missing_keys = set(obj._fields) - set(d.keys())
-  if missing_keys:
-    raise ValueError('missing keys: %s' % ' '.join(missing_keys))
+  unknown_keys = set(d.keys()) - set(obj._fields)
+  if unknown_keys:
+    raise ValueError('unknown keys: %s' % ' '.join(unknown_keys))
 
   if d[name_key] != name:
     raise ValueError('account "%s" has the %s field set to "%s"' %
@@ -68,31 +84,19 @@ def _ParseAccount(name, name_key, content, obj, defaults):
 
 def ParseGroup(name, content):
   """Parse |content| as a Group object"""
-  defaults = {
-      'password': '!',
-      'users': '',
-      'defunct': '',
-  }
-  return _ParseAccount(name, 'group', content, Group, defaults)
+  return _ParseAccount(name, 'group', content, Group)
 
 
 def ParseUser(name, content):
   """Parse |content| as a User object"""
-  defaults = {
-      'gecos': '',
-      'home': '/dev/null',
-      'password': '!',
-      'shell': '/bin/false',
-      'defunct': '',
-  }
-  return _ParseAccount(name, 'user', content, User, defaults)
+  return _ParseAccount(name, 'user', content, User)
 
 
-def AlignWidths(arr):
+def AlignWidths(arr: List[NamedTuple]) -> Dict:
   """Calculate a set of widths for alignment
 
   Args:
-    arr: An array of collections.namedtuple objects
+    arr: An array of accounts.
 
   Returns:
     A dict whose fields have the max length
@@ -108,11 +112,11 @@ def AlignWidths(arr):
   return d
 
 
-def DisplayAccounts(accts, order):
+def DisplayAccounts(accts: List[NamedTuple], order):
   """Display |accts| as a table using |order| for field ordering
 
   Args:
-    accts: An array of collections.namedtuple objects
+    accts: An array of accounts.
     order: The order in which to display the members
   """
   obj = type(accts[0])
