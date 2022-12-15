@@ -5,7 +5,6 @@ EAPI=7
 
 SLOT="0"
 KEYWORDS="*"
-LICENSE=BSD-Google
 
 inherit user
 
