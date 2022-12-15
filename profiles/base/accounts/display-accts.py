@@ -64,20 +64,20 @@ def _ParseAccount(name, name_key, content, obj):
 
     # Disallow leading & trailing whitespace.
     if line != line.strip():
-      raise ValueError('Trim leading/trailing whitespace: "%s"' % line)
+      raise ValueError(f'Trim leading/trailing whitespace: "{line}"')
 
     key, val = line.split(':')
     if key not in obj._fields:
-      raise ValueError('unknown key: %s' % key)
+      raise ValueError(f'unknown key: {key}')
     d[key] = val
 
   unknown_keys = set(d.keys()) - set(obj._fields)
   if unknown_keys:
-    raise ValueError('unknown keys: %s' % ' '.join(unknown_keys))
+    raise ValueError(f'unknown keys: {" ".join(unknown_keys)}')
 
   if d[name_key] != name:
-    raise ValueError('account "%s" has the %s field set to "%s"' %
-                     (name, name_key, d[name_key]))
+    raise ValueError(
+        f'account "{name}" has "{name_key}" field set to "{d[name_key]}"')
 
   return obj(**d)
 
@@ -127,7 +127,7 @@ def DisplayAccounts(accts: List[NamedTuple], order):
   widths = AlignWidths([header_obj] + accts)
   def p(obj):
     for k in keys:
-      print('%-*s ' % (widths[k], getattr(obj, k)), end='')
+      print(f'{getattr(obj, k):<{widths[k] + 1}}', end='')
     print()
 
   for a in [header_obj] + sorted(accts, key=sorter):
@@ -153,13 +153,13 @@ def CheckConsistency(groups, users):
   for gid in [k for k, v in gid_counts.items() if v > 1]:
     ret = False
     dupes = ', '.join(x.group for x in groups if x.gid == gid)
-    print('error: duplicate gid found: %s: %s' % (gid, dupes), file=sys.stderr)
+    print(f'error: duplicate gid found: {gid}: {dupes}', file=sys.stderr)
 
   uid_counts = collections.Counter(x.uid for x in users)
   for uid in [k for k, v in uid_counts.items() if v > 1]:
     ret = False
     dupes = ', '.join(x.user for x in users if x.uid == uid)
-    print('error: duplicate uid found: %s: %s' % (uid, dupes), file=sys.stderr)
+    print(f'error: duplicate uid found: {uid}: {dupes}', file=sys.stderr)
 
   for group in groups:
     if not VALID_ACCT_NAME_RE.match(group.group):
@@ -181,8 +181,8 @@ def CheckConsistency(groups, users):
     for group in groups:
       for user in missing_users:
         if user in group.users.split(','):
-          print('error: group "%s" wants missing user "%s"' %
-                (group.group, user), file=sys.stderr)
+          print(f'error: group "{group.group}" wants missing user "{user}"',
+                file=sys.stderr)
 
   return ret
 
@@ -213,13 +213,13 @@ def ShowNextFree(groups, users):
       ('Namespaces', 600, 699),
   )
   for name, low_id, high_id in RANGES:
-    print('%s:' % name)
+    print(f'{name}:')
     for accts, key in ((groups, 'gid'), (users, 'uid')):
       if accts:
         free_accts = _FindFreeIds(accts, key, low_id, high_id)
         if len(free_accts) > 10:
           free_accts = free_accts[0:10] + ['...']
-        print('  %s: %s' % (key, free_accts))
+        print(f'  {key}: {free_accts}')
     print()
 
 
@@ -262,7 +262,7 @@ def main(argv):
       else:
         users.append(ParseUser(f.name, content))
     except ValueError as e:
-      print('error: %s: %s' % (f, e), file=sys.stderr)
+      print(f'error: {f}: {e}', file=sys.stderr)
       return os.EX_DATAERR
 
   if opts.show_free:
