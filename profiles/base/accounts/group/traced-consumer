@@ -7,4 +7,4 @@
 #      trace using the Perfetto UI (ui.perfetto.dev).
 group:traced-consumer
 gid:20164
-users:traced,chronos
+users:traced,chronos,debugd
