@@ -3,4 +3,4 @@ set noparent
 per-file *.py = file: /OWNERS
 
 # The security team are domain experts in account isolation.
-include OWNERS.security
+include /OWNERS.security
