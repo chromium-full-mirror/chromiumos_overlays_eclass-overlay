@@ -643,24 +643,4 @@ enewgroup() {
 	einfo "Done with group: '${egroup}'."
 }
 
-# TODO(b/187790077): Delete this once ebuilds move to user-info.eclass.
-# @FUNCTION: egethome
-# @USAGE: <user>
-# @DESCRIPTION:
-# Gets the home directory for the specified user.
-egethome() {
-	[[ $# -eq 1 ]] || die "usage: egethome <user>"
-	egetent passwd "$1" | cut -d: -f6
-}
-
-# TODO(b/187790077): Delete this once ebuilds move to user-info.eclass.
-# @FUNCTION: egetshell
-# @USAGE: <user>
-# @DESCRIPTION:
-# Gets the shell for the specified user.
-egetshell() {
-	[[ $# -eq 1 ]] || die "usage: egetshell <user>"
-	egetent passwd "$1" | cut -d: -f7
-}
-
 fi
