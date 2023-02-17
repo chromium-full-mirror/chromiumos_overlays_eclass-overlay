@@ -1,0 +1,9 @@
+DEFINED_PHASES=preinst pretend
+DEPEND=sys-apps/baselayout
+DESCRIPTION=System group: kmem
+EAPI=7
+KEYWORDS=*
+RDEPEND=sys-apps/baselayout
+SLOT=0
+_eclasses_=acct-group	9c40b46ef2ec0290011028153e75287e	user	4e2ffee100481639425c80355dd60c7b	user-info	23cfd192154f4aeac3a0cff98113134e
+_md5_=fe0ca6a296e1cd2a7cc95b45e44992be
