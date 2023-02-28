@@ -1422,5 +1422,37 @@ python_generate_cffi_modules() {
 	die "${FUNCNAME}() is invalid for python-r1 suite"
 }
 
+# @FUNCTION: python_has_version
+# @USAGE: [-b|-d|-r] <atom>...
+# @DESCRIPTION:
+# A convenience wrapper for has_version() with verbose output and better
+# defaults for use in python_check_deps().
+#
+# The wrapper accepts -b/-d/-r options to indicate the root to perform
+# the lookup on.  Unlike has_version, the default is -b.
+#
+# The wrapper accepts multiple package specifications.  For the check
+# to succeed, *all* specified atoms must match.
+python_has_version() {
+	debug-print-function ${FUNCNAME} "${@}"
+
+	local root_arg=( -b )
+	case ${1} in
+		-b|-d|-r)
+			root_arg=( "${1}" )
+			shift
+			;;
+	esac
+
+	local pkg
+	for pkg; do
+		ebegin "    ${pkg}"
+		has_version "${root_arg[@]}" "${pkg}"
+		eend ${?} || return
+	done
+
+	return 0
+}
+
 _PYTHON_UTILS_R1=1
 fi
