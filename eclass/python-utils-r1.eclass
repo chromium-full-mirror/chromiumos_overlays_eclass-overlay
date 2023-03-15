@@ -40,7 +40,6 @@ inherit toolchain-funcs
 # All supported Python implementations, most preferred last.
 _PYTHON_ALL_IMPLS=(
 	pypy3
-	python2_7
 	python3_7 python3_8 python3_9 python3_6
 )
 readonly _PYTHON_ALL_IMPLS
@@ -79,9 +78,6 @@ _python_impl_supported() {
 	case "${impl}" in
 		python3_[6-9]|pypy3)
 			return 0
-			;;
-		python2_7)
-			return 1
 			;;
 		*)
 			[[ ${PYTHON_COMPAT_NO_STRICT} ]] && return 1
