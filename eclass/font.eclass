@@ -1,5 +1,11 @@
 # Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
+#
+# Chromium note: the Gentoo version of this eclass performs additional fc-cache
+# logic in pkg_postinst()/pkg_postrm(), to generate/clean cache files
+# respectively. We don't want to leave these cache files un-owned by packages,
+# and instead generate those caches in the chromeos-base/chromeos-fonts ebuild.
+# See also b/187790181.
 
 # @ECLASS: font.eclass
 # @MAINTAINER:
@@ -215,42 +221,13 @@ font_src_install() {
 	done
 }
 
-# @FUNCTION: _update_fontcache
-# @DESCRIPTION:
-# Updates fontcache if !prefix and media-libs/fontconfig installed
-_update_fontcache() {
-	if [[ -z ${ROOT} ]] ; then
-		if has_version media-libs/fontconfig ; then
-			ebegin "Updating global fontcache"
-			fc-cache -fs
-			if ! eend $? ; then
-				die "failed to update global fontcache"
-			fi
-		else
-			einfo "Skipping fontcache update (media-libs/fontconfig not installed)"
-		fi
-	else
-		einfo "Skipping fontcache update (ROOT != /)"
-	fi
-}
-
 # @FUNCTION: font_pkg_postinst
 # @DESCRIPTION:
 # The font pkg_postinst function.
+# We've stubbed this out (see Chromium notes above) but leave its identifier,
+# so portage-stable ebuilds can still refer to it.
 font_pkg_postinst() {
-	if [[ -n ${FONT_CONF[@]} ]]; then
-		local conffile
-		elog "The following fontconfig configuration files have been installed:"
-		elog
-		for conffile in "${FONT_CONF[@]}"; do
-			[[ -e "${EROOT}"/etc/fonts/conf.avail/${conffile##*/} ]] &&
-				elog "  ${conffile##*/}"
-		done
-		elog
-		elog "Use \`eselect fontconfig\` to enable/disable them."
-	fi
-
-	_update_fontcache
+	:
 }
 
 # @FUNCTION: font_pkg_postrm
@@ -258,7 +235,6 @@ font_pkg_postinst() {
 # The font pkg_postrm function.
 font_pkg_postrm() {
 	font_cleanup_dirs
-	_update_fontcache
 }
 
 fi
