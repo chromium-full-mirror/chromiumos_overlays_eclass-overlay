@@ -67,3 +67,8 @@ ARC_VENDOR_DIR="/build/rootfs${ARC_PREFIX}/vendor"
 # Path to install directory for temporary /etc build files (relative to
 # sysroot).
 ARC_ETC_DIR="/build/rootfs${ARC_PREFIX}/etc"
+
+# @ECLASS-VARIABLE: DEPOT_TOOLS
+# @DESCRIPTION:
+# In-chroot path to location of mounted depot_tools.
+DEPOT_TOOLS="/mnt/host/depot_tools"
