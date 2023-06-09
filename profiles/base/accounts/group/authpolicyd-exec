@@ -1,3 +1,4 @@
 group:authpolicyd-exec
 gid:607
 users:
+defunct:true
