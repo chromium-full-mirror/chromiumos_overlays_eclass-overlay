@@ -46,10 +46,10 @@ _is_cros_device() {
 # @USAGE: <calling func name>
 _assert_pkg_ebuild_phase() {
 	case ${EBUILD_PHASE} in
-	setup|preinst) ;;
+	setup|preinst|postinst) ;;
 	*)
 		eerror "'$1()' called from '${EBUILD_PHASE}' phase which is not OK:"
-		eerror "You may only call from pkg_{setup,preinst} functions."
+		eerror "You may only call from pkg_{setup,preinst,postinst} functions."
 		eerror "Package fails at QA and at life.  Please file a bug."
 		die "Bad package!  $1 is only for use in some pkg_* functions!"
 	esac
