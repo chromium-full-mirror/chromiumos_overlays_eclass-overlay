@@ -515,7 +515,9 @@ enewuser() {
 
 	if ! "${is_in_root}" ; then
 		if _write_entry_to_db "${entry}" passwd "${ROOT}" ; then
-			if [[ ! -e ${ROOT}/${ehome} ]] ; then
+			# We use HOME=/dev/null to mean "user doesn't have a real homedir".
+			# Don't try to make it as an actual directory.
+			if [[ ! -e ${ROOT}/${ehome} && "${ehome}" != "/dev/null" ]] ; then
 				einfo " - Creating ${ehome} in ${ROOT}"
 				mkdir -p "${ROOT}/${ehome}"
 				chown "${euser}" "${ROOT}/${ehome}"
