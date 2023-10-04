@@ -214,14 +214,16 @@ _assert_fields_in_sync() {
 # @USAGE: <lockfile>
 # @DESCRIPTION:
 # Grabs a lock on <lockfile> in a race-free, portable manner.
-# We need to use this mechanism in order to be compatible with the shadow utils
-# (groupadd, useradd, etc).
+# We imitate a locking scheme similar to shadow utils (groupadd, useradd, etc),
+# but we break compatibility by using mktemp instead of PID-based uniqueness,
+# and by placing the lock in /tmp instead of the same place as the DB (e.g.,
+# /etc/...). We don't use shadow utils in the SDK, so this is fine.
 _portable_grab_lock() {
 	local lockfile=$1
-	local lockfile_1="${lockfile}.${BASHPID}"
+	local lockfile_1
 	local timeout=$(( 60 * 5 )) # 5 minute timeout
 
-	touch "${lockfile_1}"
+	lockfile_1="$(mktemp "${lockfile}.XXXXXXX")" || die "Failed to create ${lockfile}.<X>"
 	until ln "${lockfile_1}" "${lockfile}" &> /dev/null; do
 		sleep 1
 		[[ $(( timeout-- )) -le 0 ]] && die "Timeout while trying to lock ${lockfile}"
@@ -251,8 +253,7 @@ _write_entry_to_db() {
 		ewarn "Unable to modify ${db} under ${root} due to read-only mount."
 		return 1
 	fi
-	 # Use the same lock file as the shadow utils.
-	local lockfile="${dbfile}.lock"
+	local lockfile="${root}/tmp/${dbfile##*/}.lock"
 
 	_portable_grab_lock "${lockfile}"
 
@@ -298,7 +299,7 @@ egetent() {
 	[[ ! -e "${dbfile}" ]] && die "${db} under ${root} does not exist."
 	[[ ! -w "${dbfile}" ]] && use_lock=false  # File can't change anyway!
 
-	local lockfile="${dbfile}.lock"
+	local lockfile="${root}/tmp/${dbfile##*/}.lock"
 	${use_lock} && _portable_grab_lock "${lockfile}"
 
 	awk -F':' -v key="${key}" \
