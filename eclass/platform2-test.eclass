@@ -46,9 +46,17 @@ BDEPEND="
 	)
 "
 
+# python: platform2_test.py may run tests via gtest-parallel, which is a python
+# script. Because this is run after chroot'ing into the sysroot, this needs to
+# be in DEPEND, not BDEPEND.
+DEPEND="
+	!cros_host? ( dev-lang/python )
+"
+
 case "${PLATFORM2_TEST_DEPS}" in
 	test-only)
 		BDEPEND="test? ( ${BDEPEND} )"
+		DEPEND="test? ( ${DEPEND} )"
 		;;
 	build+test)
 		;;
