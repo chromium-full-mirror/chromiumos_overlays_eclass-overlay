@@ -37,7 +37,6 @@ IUSE="cros_host test"
 
 BDEPEND="
 	!cros_host? (
-		chromeos-base/chromite-sdk
 		dev-python/psutil
 		sys-apps/iproute2
 		sys-apps/proot
