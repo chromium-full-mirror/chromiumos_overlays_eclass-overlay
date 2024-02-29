@@ -61,6 +61,9 @@ def _ParseAccount(
     name: str, name_key: str, content: str, obj: GroupOrUser
 ) -> GroupOrUser:
     """Parse the raw data in |content| and return a new |obj|."""
+    if not content:
+        raise ValueError("empty file")
+
     # Make sure files all have a trailing newline.
     if not content.endswith("\n"):
         raise ValueError("File needs a trailing newline")
@@ -83,6 +86,20 @@ def _ParseAccount(
         key, val = line.split(":")
         if key not in obj._fields:
             raise ValueError(f"unknown key: {key}")
+
+        # Check values are reasonable.
+        if val != val.strip():
+            raise ValueError(f'Trim leading/trailing whitespace: "{val}"')
+        if (
+            key in {"gid", "group", "home", "shell", "uid", "user", "users"}
+            and " " in val
+        ):
+            raise ValueError(f'Whitespace not allowed in value: {key}: "{val}"')
+        if key in {"gid", "uid"} and str(int(val)) != val:
+            raise ValueError(f'Value must be an integer: {key}: "{val}"')
+        if key in {"home", "shell"} and not val.startswith("/"):
+            raise ValueError(f'Value must be an absolute path: {key}: "{val}"')
+
         d[key] = val
 
     unknown_keys = set(d.keys()) - set(obj._fields)
@@ -367,11 +384,6 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
     for f in accounts:
         try:
             content = f.read_text(encoding="utf-8")
-            if not content:
-                raise ValueError("empty file")
-            if content[-1] != "\n":
-                raise ValueError("missing trailing newline")
-
             if "group:" in content:
                 groups.append(ParseGroup(f.name, content))
             else:
