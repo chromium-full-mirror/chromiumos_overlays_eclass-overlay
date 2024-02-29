@@ -11,7 +11,7 @@ import os
 from pathlib import Path
 import re
 import sys
-from typing import Dict, List, NamedTuple
+from typing import Dict, List, NamedTuple, Optional, Tuple, TypeVar
 
 
 assert sys.version_info >= (
@@ -49,7 +49,12 @@ class User(NamedTuple):
     defunct: str = ""
 
 
-def _ParseAccount(name, name_key, content, obj):
+GroupOrUser = TypeVar("GroupOrUser", Group, User)
+
+
+def _ParseAccount(
+    name: str, name_key: str, content: str, obj: GroupOrUser
+) -> GroupOrUser:
     """Parse the raw data in |content| and return a new |obj|."""
     # Make sure files all have a trailing newline.
     if not content.endswith("\n"):
@@ -87,17 +92,17 @@ def _ParseAccount(name, name_key, content, obj):
     return obj(**d)
 
 
-def ParseGroup(name, content):
+def ParseGroup(name: str, content: str) -> Group:
     """Parse |content| as a Group object."""
     return _ParseAccount(name, "group", content, Group)
 
 
-def ParseUser(name, content):
+def ParseUser(name: str, content: str) -> User:
     """Parse |content| as a User object."""
     return _ParseAccount(name, "user", content, User)
 
 
-def AlignWidths(arr: List[NamedTuple]) -> Dict:
+def AlignWidths(arr: List[NamedTuple]) -> Dict[NamedTuple, int]:
     """Calculate a set of widths for alignment.
 
     Args:
@@ -117,7 +122,7 @@ def AlignWidths(arr: List[NamedTuple]) -> Dict:
     return d
 
 
-def DisplayAccounts(accts: List[NamedTuple], order):
+def DisplayAccounts(accts: List[NamedTuple], order: Tuple[Tuple[str]]) -> None:
     """Display |accts| as a table using |order| for field ordering.
 
     Args:
@@ -140,7 +145,7 @@ def DisplayAccounts(accts: List[NamedTuple], order):
         p(a)
 
 
-def CheckConsistency(groups, users):
+def CheckConsistency(groups: List[Group], users: List[User]) -> bool:
     """Run various consistency checks on the lists of groups/users.
 
     This does not check for syntax/etc... errors on a per-account basis as the
@@ -196,7 +201,9 @@ def CheckConsistency(groups, users):
     return ret
 
 
-def _FindFreeIds(accts, key, low_id, high_id):
+def _FindFreeIds(
+    accts: GroupOrUser, key: int, low_id: int, high_id: int
+) -> List[int]:
     """Find all free ids in |accts| between |low_id| and |high_id| (inclusive).
 
     Args:
@@ -213,7 +220,7 @@ def _FindFreeIds(accts, key, low_id, high_id):
     return sorted(free_accts - used_accts)
 
 
-def ShowNextFree(groups, users):
+def ShowNextFree(groups: List[Group], users: List[User]) -> None:
     """Display next set of free groups/users."""
     RANGES = (
         ("CrOS daemons", 20100, 29999),
@@ -232,7 +239,7 @@ def ShowNextFree(groups, users):
         print()
 
 
-def GetParser():
+def GetParser() -> argparse.ArgumentParser:
     """Creates the argparse parser."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -253,7 +260,7 @@ def GetParser():
     return parser
 
 
-def main(argv):
+def main(argv: Optional[List[str]] = None) -> Optional[int]:
     parser = GetParser()
     opts = parser.parse_args(argv)
 
@@ -266,8 +273,8 @@ def main(argv):
         )
         consistency_check = True
 
-    groups = []
-    users = []
+    groups: List[Group] = []
+    users: List[User] = []
     for f in accounts:
         try:
             content = f.read_text(encoding="utf-8")
