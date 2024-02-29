@@ -1,4 +1,4 @@
 group:proxystate
 gid:227
-users:
+users:proxystate
 defunct:true

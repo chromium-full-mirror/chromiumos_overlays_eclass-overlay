@@ -1,4 +1,4 @@
 group:tpmd
 gid:225
-users:
+users:tpmd
 defunct:true

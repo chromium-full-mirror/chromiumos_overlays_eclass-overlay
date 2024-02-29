@@ -2,5 +2,5 @@ group:ipsec
 gid:212
 # Prepare to run shill as non-root user 'shill', but let it chgrp() files to
 # 'ipsec'.
-users:
+users:ipsec
 defunct:true

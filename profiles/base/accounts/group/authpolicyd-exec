@@ -1,4 +1,4 @@
 group:authpolicyd-exec
 gid:607
-users:
+users:authpolicyd-exec
 defunct:true

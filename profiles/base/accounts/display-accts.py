@@ -184,6 +184,10 @@ def CheckConsistency(groups: List[Group], users: List[User]) -> bool:
     """
     ret = True
 
+    # Helpers to lookup a group or user by respective ids.
+    groups_map: Dict[int, Group] = dict((x.gid, x) for x in groups)
+    # users_map: Dict[int, User] = dict((x.uid, x) for x in users)
+
     # Do not allow a GID to be used with multiple group names.
     gid_counts = collections.Counter(x.gid for x in groups)
     for gid in (k for k, v in gid_counts.items() if v > 1):
@@ -237,6 +241,44 @@ def CheckConsistency(groups: List[Group], users: List[User]) -> bool:
                         f'"{user}"',
                         file=sys.stderr,
                     )
+
+    # Find all groups declared as a user's group and make sure the groups exist.
+    missing_groups = {x.gid for x in users} - set(groups_map)
+    if missing_groups:
+        ret = False
+        for gid in missing_groups:
+            for user in users:
+                if user.gid == gid:
+                    print(
+                        f'error: user "{user.user}" wants missing group id '
+                        f'"{user.gid}"',
+                        file=sys.stderr,
+                    )
+
+    # Require users be listed in their primary group.  Practically speaking,
+    # this does not change behavior at runtime, but it helps people doing a
+    # quick spot check to understand all the users that are part of a group.
+    # Otherwise they'd have to look at the group's GID, then look at all the
+    # users to see who is using that GID.
+    for user in users:
+        group = groups_map.get(user.gid)
+        if group and not group.defunct:
+            group_users = group.users.split(",")
+            if not user.defunct and user.user not in group_users:
+                ret = False
+                print(
+                    f'error: user "{user.user}" whose GID is "{user.gid}" is '
+                    f'missing from group "{group.group}" user list',
+                    file=sys.stderr,
+                )
+            elif user.defunct and user.user in group_users:
+                ret = False
+                print(
+                    f'error: defunct user "{user.user}" whose GID is '
+                    f'"{user.gid}" should not be in group "{group.group}" '
+                    "user list",
+                    file=sys.stderr,
+                )
 
     return ret
 

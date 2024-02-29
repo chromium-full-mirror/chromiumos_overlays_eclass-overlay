@@ -1,4 +1,4 @@
 group:tor
 gid:214
-users:
+users:tor
 defunct:true

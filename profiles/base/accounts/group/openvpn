@@ -1,4 +1,4 @@
 group:openvpn
 gid:217
-users:
+users:openvpn
 defunct:true

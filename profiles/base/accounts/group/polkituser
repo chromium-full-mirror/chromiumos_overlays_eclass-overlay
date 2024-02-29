@@ -1,4 +1,4 @@
 group:polkituser
 gid:206
-users:
+users:polkituser
 defunct:true

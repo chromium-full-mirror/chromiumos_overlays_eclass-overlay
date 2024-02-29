@@ -1,4 +1,4 @@
 group:midis
 gid:608
 # The browser runs as chronos.
-users:chronos
+users:chronos,midis
