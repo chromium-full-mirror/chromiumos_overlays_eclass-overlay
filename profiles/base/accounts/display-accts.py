@@ -130,7 +130,7 @@ def DisplayAccounts(accts: List[NamedTuple], order: Tuple[Tuple[str]]) -> None:
         order: The order in which to display the members.
     """
     obj = type(accts[0])
-    header_obj = obj(**dict([(k, (v if v else k).upper()) for k, v in order]))
+    header_obj = obj(**dict((k, (v if v else k).upper()) for k, v in order))
     keys = [k for k, _ in order]
     sorter = lambda x: int(getattr(x, keys[0]))
 
@@ -161,13 +161,13 @@ def CheckConsistency(groups: List[Group], users: List[User]) -> bool:
     ret = True
 
     gid_counts = collections.Counter(x.gid for x in groups)
-    for gid in [k for k, v in gid_counts.items() if v > 1]:
+    for gid in (k for k, v in gid_counts.items() if v > 1):
         ret = False
         dupes = ", ".join(x.group for x in groups if x.gid == gid)
         print(f"error: duplicate gid found: {gid}: {dupes}", file=sys.stderr)
 
     uid_counts = collections.Counter(x.uid for x in users)
-    for uid in [k for k, v in uid_counts.items() if v > 1]:
+    for uid in (k for k, v in uid_counts.items() if v > 1):
         ret = False
         dupes = ", ".join(x.user for x in users if x.uid == uid)
         print(f"error: duplicate uid found: {uid}: {dupes}", file=sys.stderr)
