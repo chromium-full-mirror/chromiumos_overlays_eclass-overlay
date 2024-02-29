@@ -4,4 +4,4 @@ gid:5
 # before suspending the system.
 # The braille display subsystem also needs access.
 # bootsplash needs access to display the battery percentage.
-users:power,brltty,bootsplash
+users:bootsplash,brltty,power

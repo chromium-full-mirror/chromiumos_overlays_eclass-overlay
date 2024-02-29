@@ -4,4 +4,4 @@ gid:85
 # dlm for DisplayLinkManager daemon access to usb.
 # modem for modemfwd access to update modem devices.
 # fwupd: For fwupd firmware updates that use usb devices.
-users:mtp,brltty,dlm,modem,fwupd
+users:brltty,dlm,fwupd,modem,mtp

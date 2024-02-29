@@ -1,4 +1,4 @@
 group:shadercached
 password:!
 gid:333
-users:shadercached,crosvm
+users:crosvm,shadercached

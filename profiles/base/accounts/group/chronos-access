@@ -6,4 +6,4 @@ gid:1001
 # This includes all users accessing opencryptoki database files.
 #
 # Processes running with chronos-access need enforcing SELinux domains.
-users:vpn,chronos,cros-disks,imageloaderd,crash,dlp,image-burner,seneschal,spaced
+users:chronos,crash,cros-disks,dlp,image-burner,imageloaderd,seneschal,spaced,vpn

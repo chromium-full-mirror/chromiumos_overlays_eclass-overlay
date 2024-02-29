@@ -1,3 +1,3 @@
 group:video
 gid:27
-users:root,chronos,arc-camera,dlm,rtanalytics,crosvm,cfm-monitor,smdisplay,cdm-oemcrypto,cros_healthd,nvpd,ml-core,runtime_probe,fwupd
+users:arc-camera,cdm-oemcrypto,cfm-monitor,chronos,cros_healthd,crosvm,dlm,fwupd,ml-core,nvpd,root,rtanalytics,runtime_probe,smdisplay

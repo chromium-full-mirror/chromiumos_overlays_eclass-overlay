@@ -160,18 +160,21 @@ def CheckConsistency(groups: List[Group], users: List[User]) -> bool:
     """
     ret = True
 
+    # Do not allow a GID to be used with multiple group names.
     gid_counts = collections.Counter(x.gid for x in groups)
     for gid in (k for k, v in gid_counts.items() if v > 1):
         ret = False
         dupes = ", ".join(x.group for x in groups if x.gid == gid)
         print(f"error: duplicate gid found: {gid}: {dupes}", file=sys.stderr)
 
+    # Do not allow a UID to be used with multiple user names.
     uid_counts = collections.Counter(x.uid for x in users)
     for uid in (k for k, v in uid_counts.items() if v > 1):
         ret = False
         dupes = ", ".join(x.user for x in users if x.uid == uid)
         print(f"error: duplicate uid found: {uid}: {dupes}", file=sys.stderr)
 
+    # Check group & user naming conventions.
     for group in groups:
         if not VALID_ACCT_NAME_RE.match(group.group):
             print(f"error: invalid group account name: {group.group}")
@@ -179,6 +182,19 @@ def CheckConsistency(groups: List[Group], users: List[User]) -> bool:
         if not VALID_ACCT_NAME_RE.match(user.user):
             print(f"error: invalid user account name: {user.user}")
 
+    # Require group's user lists be kept sorted.
+    for group in groups:
+        want_users = ",".join(sorted(group.users.split(",")))
+        if group.users != want_users:
+            ret = False
+            print(
+                f'error: group "{group.group}" user list must be sorted: '
+                f'"{want_users}"',
+                file=sys.stderr,
+            )
+
+    # Find all the users declared as members of groups and make sure those
+    # users actually exist.
     found_users = set(x.user for x in users)
     want_users = set()
     for group in groups:

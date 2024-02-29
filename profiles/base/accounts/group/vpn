@@ -2,4 +2,4 @@
 # (e.g., configuration files)
 group:vpn
 gid:20174
-users:vpn,shill
+users:shill,vpn

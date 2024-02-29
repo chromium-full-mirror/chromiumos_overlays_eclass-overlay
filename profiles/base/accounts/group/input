@@ -8,4 +8,4 @@ gid:222
 #   - Telemetry: Retrieve vendor name.
 #   - Event: HDMI plug-in/out, audio device plug-in/out.
 #   - Diagnostics: Volume button pressed or not.
-users:cras,power,chronos,healthd_evdev
+users:chronos,cras,healthd_evdev,power
