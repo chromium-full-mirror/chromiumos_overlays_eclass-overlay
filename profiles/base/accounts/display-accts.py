@@ -7,6 +7,7 @@
 
 import argparse
 import collections
+import datetime
 import os
 from pathlib import Path
 import re
@@ -18,6 +19,10 @@ assert sys.version_info >= (
     3,
     6,
 ), f"Python 3.6+ required, but found {sys.version_info}"
+
+
+THIS_FILE = Path(__file__).resolve()
+OVERLAY_ROOT = THIS_FILE.parents[3]
 
 
 # Regex to match valid account names.
@@ -255,6 +260,68 @@ def ShowNextFree(groups: List[Group], users: List[User]) -> None:
         print()
 
 
+def WriteEbuild(account: GroupOrUser, groups: List[Group]) -> None:
+    """Writes an ebuild for the account."""
+
+    maybe_gecos = ""
+    if isinstance(account, Group):
+        name = account.group
+        ty = "group"
+        acct_lines = [f"ACCT_GROUP_ID={account.gid}"]
+    else:
+        name = account.user
+        ty = "user"
+        acct_lines = [f"ACCT_USER_ID={account.uid}"]
+        user_groups = [x.group for x in groups if account.user in x.users]
+        if user_groups:
+            acct_lines.append(f'ACCT_USER_GROUPS=( {" ".join(user_groups)} )')
+        if account.gecos:
+            maybe_gecos = f'\nDESCRIPTION="{account.gecos}"\n'
+
+    acct_lines = "\n".join(acct_lines)
+    content = f"""\
+EAPI=7
+
+inherit acct-{ty}
+{maybe_gecos}
+# NB: These settings are ignored in CrOS for now.
+# See the files in profiles/base/accounts/ instead.
+
+{acct_lines}
+"""
+
+    account_dir = OVERLAY_ROOT / f"acct-{ty}" / name
+
+    for path in account_dir.glob(f"{name}-*.ebuild"):
+        if content in path.read_text(encoding="utf-8"):
+            print(path.relative_to(OVERLAY_ROOT), "is up to date")
+            return
+        # Needs update, bump revision.
+        path.unlink()
+        ebuild = path.with_name(
+            re.sub(
+                r"-r(\d+)\.ebuild",
+                lambda match: "-r%d.ebuild" % (int(match.group(1)) + 1),
+                path.name,
+            )
+        )
+        break
+    else:
+        # No existing ebuild. Creat a new one.
+        account_dir.mkdir(exist_ok=True)
+        ebuild = account_dir / f"{name}-1-r1.ebuild"
+
+    ebuild.write_text(
+        f"""# Copyright {datetime.date.today().year} The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+{content}""",
+        encoding="utf-8",
+    )
+    print(f"Wrote {ebuild.relative_to(OVERLAY_ROOT)}")
+
+
 def GetParser() -> argparse.ArgumentParser:
     """Creates the argparse parser."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -271,6 +338,12 @@ def GetParser() -> argparse.ArgumentParser:
         help="Validate all the user accounts",
     )
     parser.add_argument(
+        "--write-ebuild",
+        default=False,
+        action="store_true",
+        help="Write an ebuild for the specified accounts",
+    )
+    parser.add_argument(
         "account", nargs="*", type=Path, help="Display these account files only"
     )
     return parser
@@ -283,7 +356,7 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
     accounts = opts.account
     consistency_check = False
     if not accounts:
-        accounts_dir = Path(__file__).resolve().parent
+        accounts_dir = THIS_FILE.parent
         accounts = list((accounts_dir / "group").glob("*")) + list(
             (accounts_dir / "user").glob("*")
         )
@@ -339,6 +412,10 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
 
     if consistency_check and not CheckConsistency(groups, users):
         return os.EX_DATAERR
+
+    if opts.write_ebuild:
+        for account in [*groups, *users]:
+            WriteEbuild(account, groups)
 
 
 if __name__ == "__main__":
