@@ -1,1 +1,1 @@
-Please see https://chromium.googlesource.com/chromiumos/docs/+/HEAD/account_management.md
+Please see https://www.chromium.org/chromium-os/developer-library/reference/build/account-management/
