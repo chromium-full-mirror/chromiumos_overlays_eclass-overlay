@@ -124,7 +124,7 @@ def ParseUser(name: str, content: str) -> User:
     return _ParseAccount(name, "user", content, User)
 
 
-def AlignWidths(arr: List[NamedTuple]) -> Dict[NamedTuple, int]:
+def AlignWidths(arr: List[NamedTuple]) -> Dict[str, int]:
     """Calculate a set of widths for alignment.
 
     Args:
@@ -157,6 +157,8 @@ def DisplayAccounts(accts: List[NamedTuple], order: Tuple[Tuple[str]]) -> None:
     sorter = lambda x: int(getattr(x, keys[0]))
 
     widths = AlignWidths([header_obj] + accts)
+    # Don't pad out the last column to tighten it up.
+    widths[keys[-1]] = 0
 
     def p(obj):
         for k in keys:
@@ -401,9 +403,9 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
             order = (
                 ("gid", ""),
                 ("group", ""),
+                ("defunct", ""),
                 ("password", "pass"),
                 ("users", ""),
-                ("defunct", ""),
             )
             DisplayAccounts(groups, order)
 
@@ -414,11 +416,11 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
                 ("uid", ""),
                 ("gid", ""),
                 ("user", ""),
+                ("defunct", ""),
                 ("shell", ""),
                 ("home", ""),
                 ("password", "pass"),
                 ("gecos", ""),
-                ("defunct", ""),
             )
             DisplayAccounts(users, order)
 
