@@ -8,6 +8,7 @@
 import argparse
 import collections
 import datetime
+import logging
 import os
 from pathlib import Path
 import re
@@ -193,32 +194,34 @@ def CheckConsistency(groups: List[Group], users: List[User]) -> bool:
     for gid in (k for k, v in gid_counts.items() if v > 1):
         ret = False
         dupes = ", ".join(x.group for x in groups if x.gid == gid)
-        print(f"error: duplicate gid found: {gid}: {dupes}", file=sys.stderr)
+        logging.error("duplicate gid found: %s: %s", gid, dupes)
 
     # Do not allow a UID to be used with multiple user names.
     uid_counts = collections.Counter(x.uid for x in users)
     for uid in (k for k, v in uid_counts.items() if v > 1):
         ret = False
         dupes = ", ".join(x.user for x in users if x.uid == uid)
-        print(f"error: duplicate uid found: {uid}: {dupes}", file=sys.stderr)
+        logging.error("duplicate uid found: %s: %s", uid, dupes)
 
     # Check group & user naming conventions.
     for group in groups:
         if not VALID_ACCT_NAME_RE.match(group.group):
-            print(f"error: invalid group account name: {group.group}")
+            ret = False
+            logging.error("invalid group account name: %s", group.group)
     for user in users:
         if not VALID_ACCT_NAME_RE.match(user.user):
-            print(f"error: invalid user account name: {user.user}")
+            ret = False
+            logging.error("invalid user account name: %s", user.user)
 
     # Require group's user lists be kept sorted.
     for group in groups:
         want_users = ",".join(sorted(group.users.split(",")))
         if group.users != want_users:
             ret = False
-            print(
-                f'error: group "{group.group}" user list must be sorted: '
-                f'"{want_users}"',
-                file=sys.stderr,
+            logging.error(
+                'group "%s" user list must be sorted: "%s"',
+                group.group,
+                want_users,
             )
 
     # Find all the users declared as members of groups and make sure those
@@ -232,14 +235,14 @@ def CheckConsistency(groups: List[Group], users: List[User]) -> bool:
     missing_users = want_users - found_users
     if missing_users:
         ret = False
-        print("error: group lists unknown users", file=sys.stderr)
+        logging.error("group lists unknown users")
         for group in groups:
             for user in missing_users:
                 if user in group.users.split(","):
-                    print(
-                        f'error: group "{group.group}" wants missing user '
-                        f'"{user}"',
-                        file=sys.stderr,
+                    logging.error(
+                        'group "%s" wants missing user "%s"',
+                        group.group,
+                        user,
                     )
 
     # Find all groups declared as a user's group and make sure the groups exist.
@@ -249,10 +252,10 @@ def CheckConsistency(groups: List[Group], users: List[User]) -> bool:
         for gid in missing_groups:
             for user in users:
                 if user.gid == gid:
-                    print(
-                        f'error: user "{user.user}" wants missing group id '
-                        f'"{user.gid}"',
-                        file=sys.stderr,
+                    logging.error(
+                        'user "%s" wants missing group id "%s"',
+                        user.user,
+                        user.gid,
                     )
 
     # Require users be listed in their primary group.  Practically speaking,
@@ -266,18 +269,21 @@ def CheckConsistency(groups: List[Group], users: List[User]) -> bool:
             group_users = group.users.split(",")
             if not user.defunct and user.user not in group_users:
                 ret = False
-                print(
-                    f'error: user "{user.user}" whose GID is "{user.gid}" is '
-                    f'missing from group "{group.group}" user list',
-                    file=sys.stderr,
+                logging.error(
+                    'user "%s" whose GID is "%s" is missing from group '
+                    '"%s" user list',
+                    user.user,
+                    user.gid,
+                    group.group,
                 )
             elif user.defunct and user.user in group_users:
                 ret = False
-                print(
-                    f'error: defunct user "{user.user}" whose GID is '
-                    f'"{user.gid}" should not be in group "{group.group}" '
-                    "user list",
-                    file=sys.stderr,
+                logging.error(
+                    'defunct user "%s" whose GID is "%s" '
+                    'should not be in group "%s" user list',
+                    user.user,
+                    user.gid,
+                    group.group,
                 )
 
     return ret
@@ -411,6 +417,11 @@ def GetParser() -> argparse.ArgumentParser:
 
 
 def main(argv: Optional[List[str]] = None) -> Optional[int]:
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(levelname)s: %(message)s",
+    )
+
     parser = GetParser()
     opts = parser.parse_args(argv)
 
@@ -433,7 +444,7 @@ def main(argv: Optional[List[str]] = None) -> Optional[int]:
             else:
                 users.append(ParseUser(f.name, content))
         except ValueError as e:
-            print(f"error: {f}: {e}", file=sys.stderr)
+            logging.error("%s: %s", f, e)
             return os.EX_DATAERR
 
     if opts.show_free:
