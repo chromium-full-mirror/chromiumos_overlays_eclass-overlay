@@ -188,6 +188,7 @@ _meson_create_cross_file() {
 	objcopy = $(_meson_env_array "$(tc-getOBJCOPY)")
 	objcpp = $(_meson_env_array "$(tc-getPROG OBJCXX c++)")
 	pkgconfig = '$(tc-getPKG_CONFIG)'
+	pkg-config = '$(tc-getPKG_CONFIG)'
 	strip = $(_meson_env_array "$(tc-getSTRIP)")
 	windres = $(_meson_env_array "$(tc-getRC)")
 
@@ -245,6 +246,7 @@ _meson_create_native_file() {
 	objcopy = $(_meson_env_array "$(tc-getBUILD_OBJCOPY)")
 	objcpp = $(_meson_env_array "$(tc-getBUILD_PROG OBJCXX c++)")
 	pkgconfig = '$(tc-getBUILD_PKG_CONFIG)'
+	pkg-config = '$(tc-getBUILD_PKG_CONFIG)'
 	strip = $(_meson_env_array "$(tc-getBUILD_STRIP)")
 	windres = $(_meson_env_array "$(tc-getBUILD_PROG RC windres)")
 
