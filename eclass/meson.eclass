@@ -54,7 +54,7 @@ inherit multiprocessing ninja-utils python-utils-r1 toolchain-funcs platform2-te
 
 EXPORT_FUNCTIONS src_configure src_compile src_test src_install
 
-_MESON_DEPEND=">=dev-util/meson-0.58.2-r1
+_MESON_DEPEND=">=dev-build/meson-0.58.2-r1
 	>=dev-util/ninja-1.8.2
 	dev-util/meson-format-array
 "
