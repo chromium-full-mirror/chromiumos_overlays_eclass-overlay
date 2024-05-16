@@ -4,3 +4,4 @@ gid:237
 gecos:shill's crypto-util
 home:/dev/null
 shell:/bin/false
+defunct:true
