@@ -158,10 +158,7 @@ _meson_get_machine_info() {
 # @DESCRIPTION:
 # Gets the path to exe_wrapper.
 _meson_get_exe_wrapper() {
-	# TODO: remove once we are completely migrated away from python2
-	if [[ -z ${EPYTHON} ]] || python_is_python3; then
-		echo "/mnt/host/source/src/platform2/common-mk/meson_test.py"
-	fi
+	echo "/mnt/host/source/src/platform2/common-mk/meson_test.py"
 }
 
 # @FUNCTION: _meson_create_cross_file
