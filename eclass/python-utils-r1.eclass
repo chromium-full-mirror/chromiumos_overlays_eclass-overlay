@@ -1439,5 +1439,15 @@ python_has_version() {
 	return 0
 }
 
+# @FUNCTION: gpep517
+# @USAGE: args passed directly to gpep517
+# @DESCRIPTION:
+# Wrapper to call gpep517.  Run "gpep517 --help" for help.
+gpep517() {
+	# ZIP files (used by wheels) don't support dates before January 1, 1980.
+	# Set SOURCE_DATE_EPOCH to January 1, 2020 (arbitrary choice).
+	SOURCE_DATE_EPOCH="1577836800" "$(type -P gpep517)" "$@"
+}
+
 _PYTHON_UTILS_R1=1
 fi
