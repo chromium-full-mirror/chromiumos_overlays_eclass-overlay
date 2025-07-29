@@ -44,6 +44,7 @@ inherit multiprocessing toolchain-funcs
 # All supported Python implementations, most preferred last.
 _PYTHON_ALL_IMPLS=(
 	pypy3
+	pypy3_{19..11}
 	python3_{19..6}
 )
 readonly _PYTHON_ALL_IMPLS
@@ -133,7 +134,7 @@ _python_set_impls() {
 			# please keep them in sync with _PYTHON_ALL_IMPLS
 			# and _PYTHON_HISTORICAL_IMPLS
 			case ${i} in
-				pypy3|python2_7|python3_[6-9]|python3_1[0-9])
+				pypy3|pypy3_*|python2_7|python3_[6-9]|python3_1[0-9]|python3_1[0-9]t)
 					;;
 				jython2_7|pypy|pypy1_[89]|pypy2_0|python2_[5-6]|python3_[1-5])
 					obsolete+=( "${i}" )
@@ -318,12 +319,8 @@ _python_export() {
 	local impl var
 
 	case "${1}" in
-		python*|jython*)
+		python*|jython*|pypy|pypy3*)
 			impl=${1/_/.}
-			shift
-			;;
-		pypy|pypy3)
-			impl=${1}
 			shift
 			;;
 		*)
@@ -441,7 +438,7 @@ _python_export() {
 						PYTHON_PKG_DEP="dev-lang/python:${impl#python}";;
 					pypy)
 						PYTHON_PKG_DEP='>=dev-python/pypy-7.3.9-r2:0=';;
-					pypy3)
+					pypy3*)
 						PYTHON_PKG_DEP='>=dev-python/pypy3-7.3.9_p9:0=';;
 					*)
 						die "Invalid implementation: ${impl}"
