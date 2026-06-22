@@ -45,7 +45,7 @@ if [[ -z ${_MESON_ECLASS} ]]; then
 _MESON_ECLASS=1
 
 # CROS: We need the platform2_test.py exe wrapper for both building and testing.
-PLATFORM2_TEST_DEPS="build+test"
+: "${PLATFORM2_TEST_DEPS:=build+test}"
 
 [[ ${EAPI} == 6 ]] && inherit eapi7-ver
 # CROS: meson_test.py uses platform2_test.py, so we need the platform2-test
