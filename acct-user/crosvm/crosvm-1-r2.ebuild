@@ -4,9 +4,12 @@
 
 EAPI=7
 
-inherit acct-group
+inherit acct-user
+
+DESCRIPTION="CrOS virtual machine monitor"
 
 # NB: These settings are ignored in CrOS for now.
 # See the files in profiles/base/accounts/ instead.
 
-ACCT_GROUP_ID=333
+ACCT_USER_ID=299
+ACCT_USER_GROUPS=( pluginvm video virtaccess daemon-store wayland arc-camera crosvm traced-producer cups-proxy tun )

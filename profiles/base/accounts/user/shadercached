@@ -4,3 +4,4 @@ gid:333
 gecos:VM shader cache management user
 home:/dev/null
 shell:/bin/false
+defunct:true
