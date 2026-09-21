@@ -158,6 +158,11 @@ _meson_get_machine_info() {
 # @DESCRIPTION:
 # Gets the path to exe_wrapper.
 _meson_get_exe_wrapper() {
+	# If test dependencies are test-only and tests are not enabled,
+	# we do not have the dependencies (psutil, libcap-ng, etc.) to run platform2_test.py.
+	if [[ ${PLATFORM2_TEST_DEPS} == "test-only" ]] && { ! in_iuse test || ! use test; }; then
+		return
+	fi
 	echo "/mnt/host/source/src/platform2/common-mk/meson_test.py"
 }
 
@@ -172,6 +177,11 @@ _meson_create_cross_file() {
 	_meson_get_machine_info "${CHOST}"
 
 	local fn=${T}/meson.${CHOST}.${ABI}.ini
+	local exe_wrapper=$(_meson_get_exe_wrapper)
+	local exe_wrapper_entry=""
+	if [[ -n ${exe_wrapper} ]]; then
+		exe_wrapper_entry="exe_wrapper = ['${exe_wrapper}']"
+	fi
 
 	cat > "${fn}" <<-EOF
 	[binaries]
@@ -190,7 +200,7 @@ _meson_create_cross_file() {
 	windres = $(_meson_env_array "$(tc-getRC)")
 
 	# CROS: set a wrapper script for running tests
-	exe_wrapper = ['$(_meson_get_exe_wrapper)']
+	${exe_wrapper_entry}
 
 	[built-in options]
 	c_args = $(_meson_env_array "${CFLAGS} ${CPPFLAGS}")
