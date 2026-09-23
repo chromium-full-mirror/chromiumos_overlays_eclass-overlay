@@ -44,8 +44,12 @@ esac
 if [[ -z ${_MESON_ECLASS} ]]; then
 _MESON_ECLASS=1
 
-# CROS: We need the platform2_test.py exe wrapper for both building and testing.
-: "${PLATFORM2_TEST_DEPS:=build+test}"
+# CROS: Only add platform2_test.py dependencies when running tests.
+: "${PLATFORM2_TEST_DEPS:=test-only}"
+case "${PLATFORM2_TEST_DEPS}" in
+	test-only|build+test) ;;
+	*) die "Unsupported PLATFORM2_TEST_DEPS=${PLATFORM2_TEST_DEPS}" ;;
+esac
 
 [[ ${EAPI} == 6 ]] && inherit eapi7-ver
 # CROS: meson_test.py uses platform2_test.py, so we need the platform2-test
