@@ -221,13 +221,13 @@ _assert_fields_in_sync() {
 _portable_grab_lock() {
 	local lockfile=$1
 	local lockfile_1
-	local timeout=$(( 60 * 5 )) # 5 minute timeout
+	local timeout=$(( 60 * 5 * 20 )) # 5 minute timeout (50ms intervals)
 
 	lockfile_1="$(mktemp "${lockfile}.XXXXXXX")" || die "Failed to create ${lockfile}.<X>"
 	until ln "${lockfile_1}" "${lockfile}" &> /dev/null; do
-		sleep 1
+		sleep 0.05
 		[[ $(( timeout-- )) -le 0 ]] && die "Timeout while trying to lock ${lockfile}"
-		[[ $(( timeout % 10 )) -eq 0 ]] && einfo "Waiting for lock on ${dbfile}"
+		[[ $(( timeout % 200 )) -eq 0 ]] && einfo "Waiting for lock on ${dbfile}"
 	done
 	rm "${lockfile_1}" || die "Failed to lock ${lockfile}."
 }
