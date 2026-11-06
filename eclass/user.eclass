@@ -84,10 +84,12 @@ _find_accounts_dirs() {
 		return
 	fi
 
-	local overlay
+	local overlay_dir overlays
 	local root="${SYSROOT:-${ROOT:-/}}"
-	for overlay in $(_call_portageq get_repos "${root}"); do
-		local overlay_dir=$(_call_portageq get_repo_path "${root}" "${overlay}")
+	# Resolve all overlay paths in a single portageq call instead of per-overlay.
+	overlays=$(_call_portageq get_repos "${root}")
+	# shellcheck disable=SC2086
+	for overlay_dir in $(_call_portageq get_repo_path "${root}" ${overlays}); do
 		local accounts_dir="${overlay_dir}/profiles/base/accounts"
 		if [[ -d "${accounts_dir}" ]] ; then
 			einfo "Adding ${accounts_dir} to user/group search path."
