@@ -5,5 +5,5 @@ EAPI=7
 KEYWORDS=*
 RDEPEND=sys-apps/baselayout
 SLOT=0
-_eclasses_=acct-group	9c40b46ef2ec0290011028153e75287e	user	10e6bcf7eca357997b76e8f4ce997bb8	user-info	23cfd192154f4aeac3a0cff98113134e
+_eclasses_=acct-group	9c40b46ef2ec0290011028153e75287e	user	677adc806971776bdcdecc49e7d86b5d	user-info	23cfd192154f4aeac3a0cff98113134e
 _md5_=6fff94dd4b14c8a3fc2e5de439721e68
