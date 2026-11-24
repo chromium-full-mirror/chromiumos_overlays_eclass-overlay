@@ -1,0 +1,9 @@
+DEFINED_PHASES=preinst pretend
+DEPEND=sys-apps/baselayout
+DESCRIPTION=A group for www-servers/nginx
+EAPI=7
+KEYWORDS=*
+RDEPEND=sys-apps/baselayout
+SLOT=0
+_eclasses_=acct-group	9c40b46ef2ec0290011028153e75287e	user	677adc806971776bdcdecc49e7d86b5d	user-info	23cfd192154f4aeac3a0cff98113134e
+_md5_=d10e9834f77f38c759d85ce4138a2859

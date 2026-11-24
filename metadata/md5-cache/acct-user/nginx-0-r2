@@ -1,0 +1,10 @@
+DEFINED_PHASES=preinst pretend setup
+DEPEND=sys-apps/baselayout
+DESCRIPTION=System user: nginx
+EAPI=7
+IUSE=icingaweb2 mgraph
+KEYWORDS=*
+RDEPEND=acct-group/nginx icingaweb2? ( acct-group/icingacmd acct-group/icingaweb2 ) mgraph? ( acct-group/mgraph ) sys-apps/baselayout
+SLOT=0
+_eclasses_=acct-user	8947f6cba2bec018df20b595d4f12cb2	user	677adc806971776bdcdecc49e7d86b5d	user-info	23cfd192154f4aeac3a0cff98113134e
+_md5_=b2fe2e245629d6b270cb6dd630433e65
